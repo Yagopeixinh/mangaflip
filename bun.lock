@@ -1,0 +1,11 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "mangaflip",
+      "version": "1.0.0",
+      "dependencies": {},
+      "devDependencies": {}
+    }
+  }
+}

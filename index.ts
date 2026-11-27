@@ -426,7 +426,7 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
       const id = parts[3];
       if (parts[4] === "chapters") {
         const lang = /^[a-z-]{2,8}$/i.test(q.get("lang") || "") ? q.get("lang") : "pt-br", off = clamp(Number(q.get("offset")) || 0, 0, 20000);
-        const s = new URLSearchParams({limit: "500", offset: String(off), "order[chapter]": "desc", includeExternalUrl: "1", includeFuturePublishAt: "0", includeUnavailable: "1"});
+        const s = new URLSearchParams({limit: "500", offset: String(off), "order[chapter]": "desc", includeFuturePublishAt: "0", includeUnavailable: "1"});
         s.append("translatedLanguage[]", lang); s.append("includes[]", "scanlation_group");
         const qs = s.toString();
         const d = await cached("c:" + id + qs, 120, () => md("/manga/" + id + "/feed?" + qs));

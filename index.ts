@@ -74,7 +74,7 @@ kbd{background:#2b1d3a;border:1px solid var(--line);border-radius:5px;padding:1p
 .history-card{position:relative}.history-remove{position:absolute;top:7px;right:7px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#100b18eF;color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s,background .15s;z-index:2}.history-card:hover .history-remove,.history-card:focus-within .history-remove{opacity:1}.history-remove:hover{background:var(--accent);color:#fff}@media(hover:none){.history-remove{opacity:1}}@media(prefers-reduced-motion:reduce){.history-remove{transition:none}}
 </style></head>
 <body>
-<header class="top"><div class="shell topin"><a class="logo" href="#/">MANGÁ<b>FLIP</b></a><div class="right"><span id="net">Conectando…</span><button class="btn outline" id="randBtn" title="Mangá aleatório">🎲</button><button class="btn outline" id="refresh" title="Atualizar">↻</button></div></div>
+<header class="top"><div class="shell topin"><a class="logo" href="#/" aria-label="MangáFlip — início"><img src="/assets/mangaflip-logo.jpg" alt="MangáFlip"></a><div class="right"><span id="net">Conectando…</span><button class="btn outline" id="randBtn" title="Mangá aleatório">🎲</button><button class="btn outline" id="refresh" title="Atualizar">↻</button></div></div>
 <nav class="shell nav"><button data-tab="home" class="active">⌂ Início</button><button data-tab="catalog">▤ Mangás</button><button data-tab="library">♥ Biblioteca</button><button data-tab="scans">♧ Scans</button><button data-tab="about">ⓘ Fontes</button><button data-tab="settings">⚙ Configurações</button></nav></header>
 <main class="shell">
 <section id="home">
@@ -424,6 +424,7 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
   if (req.method === "OPTIONS") return new Response(null, {headers: cors});
   if (p === "/") return new Response(html, {headers: {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"}});
   if (p === "/api/health") return J({ok: true, app: "MangáFlip", version: "1.0", sources: ["MangaDex", "AniList"], cache: mem.size, uptime: Math.round(process.uptime()), time: new Date().toISOString()}, 200, 0);
+  if (p === "/assets/mangaflip-logo.jpg") return new Response(Bun.file("./assets/mangaflip-logo.jpg"), {headers: {"Content-Type":"image/jpeg","Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
   if (p === "/favicon.ico") return new Response(null, {status: 204});
   if (p === "/icon.svg") return new Response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#7b3bc1"/><text x="32" y="45" font-size="36" font-weight="900" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif">M</text></svg>', {headers: {"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}});
   if (p === "/manifest.webmanifest") return new Response(JSON.stringify({name: "MangáFlip", short_name: "MangáFlip", start_url: "/", display: "standalone", background_color: "#100b17", theme_color: "#130d1c", lang: "pt-BR", icons: [{src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any"}]}), {headers: {"Content-Type": "application/manifest+json", "Cache-Control": "public, max-age=86400"}});

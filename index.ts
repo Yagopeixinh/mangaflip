@@ -170,12 +170,12 @@ try{const m=await api('/api/manga/'+id);if(tok!==S.nav)return;known[id]={id:m.id
 catch(e){if(tok!==S.nav)return;box.innerHTML='<div class="empty">Não foi possível abrir a obra: '+esc(e.message)+' <button class="btn outline sm" data-ro>Tentar de novo</button></div>'}}
 const num=c=>{const n=parseFloat(c.chapter);return isNaN(n)?-1:n};
 async function loadChapters(reset){const m=S.manga,tok=S.nav;if(!m)return;if(reset){S.chapters=[];S.chOffset=0;S.chTotal=0;$('#chapters').innerHTML='<div class="loading">Procurando capítulos…</div>'}
-try{const d=await api('/api/manga/'+m.id+'/chapters?lang='+encodeURIComponent(S.lang)+'&offset='+S.chOffset);if(tok!==S.nav)return;const seen=new Set(S.chapters.map(c=>c.k));for(const c of d.data)if(!seen.has(c.k)){seen.add(c.k);S.chapters.push(c)}
+try{const d=await api('/api/manga/'+m.id+'/chapters?lang='+encodeURIComponent(S.lang)+'&offset='+S.chOffset);if(tok!==S.nav)return;const seen=new Set(S.chapters.map(c=>c.id));for(const c of d.data)if(!seen.has(c.id)){seen.add(c.id);S.chapters.push(c)}
 S.chapters.sort((a,b)=>num(b)-num(a));S.chOffset=d.offset+d.limit;S.chTotal=d.total;renderChapters()}
 catch(e){if(tok!==S.nav)return;$('#chapters').innerHTML='<div class="empty">Erro ao buscar capítulos: '+esc(e.message)+' <button class="btn outline sm" data-rc>Tentar de novo</button></div>'}}
 function renderChapters(){if(!S.manga)return;const list=S.chapters.slice();if(S.order==='asc')list.reverse();const q=$('#chFind').value.trim().toLowerCase(),rd=new Set(readOf(S.manga.id));
 const arr=q?list.filter(c=>String(c.chapter||'').startsWith(q)||(c.title||'').toLowerCase().includes(q)):list;
-$('#chapters').innerHTML=arr.map(c=>'<a class="chapter'+(rd.has(c.id)?' done':'')+'" href="#/r/'+S.manga.id+'/'+c.id+'"><span><b>'+(c.chapter?'Capítulo '+esc(c.chapter):'Oneshot')+'</b>'+(rd.has(c.id)?' ✓':'')+'<br><span class="small muted">'+esc(c.title||'')+(c.title?' · ':'')+esc(c.group||'Grupo não identificado')+'</span></span><span class="small muted">'+ago(c.at)+' · '+c.pages+' pág.</span></a>').join('')||'<div class="empty">Nenhum capítulo neste idioma. Troque o idioma acima.</div>';
+$('#chapters').innerHTML=arr.map(c=>{const label=(c.chapter?'Capítulo '+esc(c.chapter):'Oneshot'),meta=esc(c.title||'')+(c.title?' · ':'')+esc(c.group||'Grupo não identificado');return c.externalUrl?'<a class="chapter" href="'+esc(c.externalUrl)+'" target="_blank" rel="noopener noreferrer"><span><b>'+label+' ↗</b><br><span class="small muted">'+meta+' · Fonte externa</span></span><span class="small muted">'+ago(c.at)+'</span></a>':'<a class="chapter'+(rd.has(c.id)?' done':'')+'" href="#/r/'+S.manga.id+'/'+c.id+'"><span><b>'+label+'</b>'+(rd.has(c.id)?' ✓':'')+'<br><span class="small muted">'+meta+'</span></span><span class="small muted">'+ago(c.at)+' · '+c.pages+' pág.</span></a>'}).join('')||'<div class="empty">Nenhum capítulo neste idioma. Troque o idioma acima.</div>';
 $('#chCount').textContent='('+S.chapters.length+')';$('#moreChapters').classList.toggle('hidden',S.chOffset>=S.chTotal)}
 async function startReading(){const m=S.manga,h=histOf(m.id);if(h){location.hash='#/r/'+m.id+'/'+h.cid;return}
 let g=0;while(S.chOffset<S.chTotal&&g++<8)await loadChapters(false);const f=S.chapters[S.chapters.length-1];if(f)location.hash='#/r/'+m.id+'/'+f.id;else toast('Nenhum capítulo disponível neste idioma')}
@@ -426,16 +426,18 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
       const id = parts[3];
       if (parts[4] === "chapters") {
         const lang = /^[a-z-]{2,8}$/i.test(q.get("lang") || "") ? q.get("lang") : "pt-br", off = clamp(Number(q.get("offset")) || 0, 0, 20000);
-        const s = new URLSearchParams({limit: "500", offset: String(off), "order[chapter]": "desc", includeExternalUrl: "0", includeFuturePublishAt: "0"});
+        const s = new URLSearchParams({limit: "500", offset: String(off), "order[chapter]": "desc", includeExternalUrl: "1", includeFuturePublishAt: "0"});
         s.append("translatedLanguage[]", lang); s.append("includes[]", "scanlation_group");
         const qs = s.toString();
         const d = await cached("c:" + id + qs, 120, () => md("/manga/" + id + "/feed?" + qs));
         const by = new Map();
         for (const c of d.data) {
-          const a = c.attributes || {}; if (!a.pages) continue;
+          const a = c.attributes || {};
+          const externalUrl = typeof a.externalUrl === "string" && /^https:\/\//i.test(a.externalUrl) ? a.externalUrl : null;
+          if (!a.pages && !externalUrl) continue;
           const g = (c.relationships || []).find(x => x.type === "scanlation_group");
-          const o = {id: c.id, k: a.chapter != null ? "c" + a.chapter : "o" + c.id, chapter: a.chapter, volume: a.volume, title: a.title || "", pages: a.pages, group: (g && g.attributes && g.attributes.name) || "", at: a.readableAt || a.publishAt};
-          const prev = by.get(o.k); if (!prev || o.pages > prev.pages) by.set(o.k, o);
+          const o = {id: c.id, k: c.id, chapter: a.chapter, volume: a.volume, title: a.title || "", pages: a.pages || 0, externalUrl, group: (g && g.attributes && g.attributes.name) || "", at: a.readableAt || a.publishAt};
+          by.set(o.k, o);
         }
         return J({data: [...by.values()], total: d.total || 0, offset: d.offset || 0, limit: d.limit || 500}, 200, 120);
       }

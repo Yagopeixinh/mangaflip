@@ -13,7 +13,7 @@ button,input,select{font:inherit;color:inherit}button{cursor:pointer}a{color:var
 .shell{max-width:1180px;margin:auto;padding:0 16px}
 .top{position:sticky;top:0;z-index:5;background:#130d1cf2;backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
 .topin{height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none}.logo svg{display:block;width:174px;height:42px;overflow:visible}.logo:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+.logo{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none}.logo img{display:block;width:174px;height:auto;max-height:46px;object-fit:contain}.logo:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
 .nav{display:flex;gap:6px;overflow:auto;padding:8px 0;scrollbar-width:none}
 .btn,.nav button,.chip{display:inline-block;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:10px;padding:9px 12px;white-space:nowrap}
 .nav button.active,.chip.active{background:#352044;border-color:#654080;color:#e2c4ff}
@@ -74,7 +74,7 @@ kbd{background:#2b1d3a;border:1px solid var(--line);border-radius:5px;padding:1p
 .history-card{position:relative}.history-remove{position:absolute;top:7px;right:7px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#100b18eF;color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s,background .15s;z-index:2}.history-card:hover .history-remove,.history-card:focus-within .history-remove{opacity:1}.history-remove:hover{background:var(--accent);color:#fff}@media(hover:none){.history-remove{opacity:1}}@media(prefers-reduced-motion:reduce){.history-remove{transition:none}}
 </style></head>
 <body>
-<header class="top"><div class="shell topin"><a class="logo" href="#/" aria-label="MangáFlip — início"><svg viewBox="0 0 230 54" role="img" aria-labelledby="mangaflipLogoTitle"><title id="mangaflipLogoTitle">MangáFlip</title><g transform="translate(2 5)"><path d="M2 8 Q17 2 31 11 V39 Q17 31 2 37Z" fill="#f7f2fb" stroke="#e7dcef" stroke-width="1.5"/><path d="M31 11 Q45 2 60 8 V37 Q45 31 31 39Z" fill="#fff" stroke="#e7dcef" stroke-width="1.5"/><path d="M31 11 V39" stroke="#d94b55" stroke-width="2"/><path d="M7 13 Q17 9 26 15 M7 19 Q17 15 26 21 M36 15 Q46 9 55 13 M36 21 Q46 15 55 19" fill="none" stroke="#33263d" stroke-width="1.6" stroke-linecap="round"/><path d="M5 5 L5 1 M57 5 L57 1" stroke="#d94b55" stroke-width="2" stroke-linecap="round"/></g><text x="72" y="35" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="-1" fill="#f7f2fb">Manga</text><text x="157" y="35" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="-1" fill="#e45b65">Flip</text></svg></a><div class="right"><span id="net">Conectando…</span><button class="btn outline" id="randBtn" title="Mangá aleatório">🎲</button><button class="btn outline" id="refresh" title="Atualizar">↻</button></div></div>
+<header class="top"><div class="shell topin"><a class="logo" href="#/" aria-label="MangáFlip — início"><img src="/assets/mangaflip-logo.jpg" alt="MangáFlip"></a><div class="right"><span id="net">Conectando…</span><button class="btn outline" id="randBtn" title="Mangá aleatório">🎲</button><button class="btn outline" id="refresh" title="Atualizar">↻</button></div></div>
 <nav class="shell nav"><button data-tab="home" class="active">⌂ Início</button><button data-tab="catalog">▤ Mangás</button><button data-tab="library">♥ Biblioteca</button><button data-tab="scans">♧ Scans</button><button data-tab="about">ⓘ Fontes</button><button data-tab="settings">⚙ Configurações</button></nav></header>
 <main class="shell">
 <section id="home">
@@ -216,18 +216,56 @@ const r=store.get('read',{});Object.keys(o.read||{}).forEach(k=>{if(isId(k))r[k]
 const THEMES={obsidian:{bg:'#100b17',panel:'#1b1425',panel2:'#241a31',line:'#392747',text:'#f5effb',muted:'#ad9dbb',accent:'#b875f2',accent2:'#7b3bc1'},midnight:{bg:'#0b1220',panel:'#121d30',panel2:'#1a2940',line:'#293d5a',text:'#edf4ff',muted:'#9db0ca',accent:'#70a9ff',accent2:'#356fc4'},graphite:{bg:'#17191d',panel:'#22262c',panel2:'#2c3139',line:'#3b424c',text:'#f1f2f4',muted:'#aeb5bf',accent:'#a9b4c4',accent2:'#596779'},plum:{bg:'#190d20',panel:'#281630',panel2:'#35203f',line:'#50345c',text:'#fff0ff',muted:'#c5a9ca',accent:'#e28cf0',accent2:'#9946aa'},ocean:{bg:'#071b24',panel:'#0e2935',panel2:'#153746',line:'#245064',text:'#e8faff',muted:'#9dc2ce',accent:'#51c6d8',accent2:'#16869b'},light:{bg:'#f4f1f8',panel:'#fff',panel2:'#eee9f4',line:'#d8cfe2',text:'#241b2d',muted:'#71667b',accent:'#8542b8',accent2:'#7132a5'}};
 function applyTheme(){const name=P.theme||'obsidian',t=THEMES[name]||THEMES.obsidian;document.documentElement.dataset.theme=name;Object.entries(t).forEach(([k,v])=>document.documentElement.style.setProperty('--'+k,v));if(P.accent)document.documentElement.style.setProperty('--accent',P.accent);$$('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===name));$$('[data-accent]').forEach(b=>{b.style.setProperty('--swatch',b.dataset.accent);b.classList.toggle('active',b.dataset.accent===(P.accent||t.accent))});$('#settingMode').value=P.mode||'scroll';$('#settingSaver').value=String(!!P.saver)}
 function fixEscapedUnicode(){
-  const decode=v=>String(v).replace(/\\u(?:\{([0-9a-f]{1,6})\}|([0-9a-f]{4}))/gi,(_,cp,u)=>{const n=parseInt(cp||u,16);try{return String.fromCodePoint(n)}catch{return _}});
+  // Decode both JSON-style escapes (\u00e7) and code-point escapes (\u{1f3b2})
+  // in visible text and common accessibility/form attributes, including dynamic API results.
+  const pattern=/\\u\{([0-9a-f]{1,6})\}|\\u([0-9a-f]{4})/gi;
+  const decode=value=>String(value).replace(pattern,(match,cp,u)=>{
+    const n=parseInt(cp||u,16);
+    if(!Number.isFinite(n)||n>0x10ffff||(n>=0xd800&&n<=0xdfff))return match;
+    try{return String.fromCodePoint(n)}catch{return match}
+  });
   const attrs=['placeholder','title','aria-label','alt','value'];
+  const skip=el=>el&&(['SCRIPT','STYLE','TEXTAREA'].includes(el.tagName)||el.isContentEditable);
   const scan=root=>{
     if(!root)return;
-    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];
-    while(walker.nextNode()){const n=walker.currentNode,p=n.parentElement;if(p&&!['SCRIPT','STYLE','TEXTAREA'].includes(p.tagName)&&/\\u(?:\{|[0-9a-f]{4})/i.test(n.nodeValue))nodes.push(n)}
-    nodes.forEach(n=>{n.nodeValue=decode(n.nodeValue)});
-    const els=root.nodeType===1?[root,...root.querySelectorAll('*')]:[...root.querySelectorAll('*')];
-    els.forEach(el=>attrs.forEach(k=>{if(el.hasAttribute(k)){const v=el.getAttribute(k),d=decode(v);if(v!==d)el.setAttribute(k,d)}}));
+    const scope=root.nodeType===1?root:root.parentElement;
+    if(!scope||skip(scope))return;
+    const walker=document.createTreeWalker(scope,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()){
+      const node=walker.currentNode;
+      if(!skip(node.parentElement)&&/\\u(?:\{|[0-9a-f]{4})/i.test(node.nodeValue))nodes.push(node);
+    }
+    nodes.forEach(node=>{node.nodeValue=decode(node.nodeValue)});
+    const els=[scope,...scope.querySelectorAll('*')];
+    els.forEach(el=>{
+      if(skip(el))return;
+      attrs.forEach(name=>{
+        if(!el.hasAttribute(name))return;
+        const before=el.getAttribute(name),after=decode(before);
+        if(before!==after)el.setAttribute(name,after);
+      });
+    });
   };
   scan(document.body);
-  if(!window.__mangaflipUnicodeObserver){window.__mangaflipUnicodeObserver=new MutationObserver(records=>records.forEach(rec=>{if(rec.type==='childList')rec.addedNodes.forEach(n=>{if(n.nodeType===1)scan(n);else if(n.nodeType===3)scan(n.parentElement)});else if(rec.type==='characterData'){const n=rec.target,v=n.nodeValue,d=decode(v);if(v!==d)n.nodeValue=d};else if(rec.type==='attributes'){const el=rec.target,k=rec.attributeName,v=el.getAttribute(k),d=decode(v);if(v!==d)el.setAttribute(k,d)}}));window.__mangaflipUnicodeObserver.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:attrs})}
+  if(!window.__mangaflipUnicodeObserver){
+    window.__mangaflipUnicodeObserver=new MutationObserver(records=>{
+      records.forEach(record=>{
+        if(record.type==='childList')record.addedNodes.forEach(node=>{
+          if(node.nodeType===1)scan(node);
+          else if(node.nodeType===3)scan(node.parentElement);
+        });
+        else if(record.type==='characterData'){
+          const node=record.target,before=node.nodeValue,after=decode(before);
+          if(before!==after)node.nodeValue=after;
+        }else if(record.type==='attributes'){
+          const el=record.target,name=record.attributeName,before=el.getAttribute(name),after=decode(before);
+          if(before!==after)el.setAttribute(name,after);
+        }
+      });
+    });
+    window.__mangaflipUnicodeObserver.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:attrs});
+  }
 }
 
 let steps=0;
@@ -386,6 +424,7 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
   if (req.method === "OPTIONS") return new Response(null, {headers: cors});
   if (p === "/") return new Response(html, {headers: {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"}});
   if (p === "/api/health") return J({ok: true, app: "MangáFlip", version: "1.0", sources: ["MangaDex", "AniList"], cache: mem.size, uptime: Math.round(process.uptime()), time: new Date().toISOString()}, 200, 0);
+  if (p === "/assets/mangaflip-logo.jpg") return new Response(Bun.file("./assets/mangaflip-logo.jpg"), {headers: {"Content-Type":"image/jpeg","Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
   if (p === "/favicon.ico") return new Response(null, {status: 204});
   if (p === "/icon.svg") return new Response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#7b3bc1"/><text x="32" y="45" font-size="36" font-weight="900" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif">M</text></svg>', {headers: {"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}});
   if (p === "/manifest.webmanifest") return new Response(JSON.stringify({name: "MangáFlip", short_name: "MangáFlip", start_url: "/", display: "standalone", background_color: "#100b17", theme_color: "#130d1c", lang: "pt-BR", icons: [{src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any"}]}), {headers: {"Content-Type": "application/manifest+json", "Cache-Control": "public, max-age=86400"}});

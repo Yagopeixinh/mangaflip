@@ -439,7 +439,7 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
           by.set(o.k, o);
         }
         const chapters = [...by.values()];
-        return J({data: chapters, total: d.total || 0, offset: d.offset || 0, limit: d.limit || 500, counts: {readable: chapters.filter(c => c.pages > 0 && !c.externalUrl).length, external: chapters.filter(c => !!c.externalUrl).length, unavailable: chapters.filter(c => !c.pages && !c.externalUrl).length}}, 200, 120);
+        return J({data: chapters, total: d.total || 0, offset: d.offset || 0, limit: d.limit || 500, counts: {readable: chapters.filter(c => c.pages > 0 && !c.externalUrl).length, external: chapters.filter(c => !!c.externalUrl).length, unavailable: chapters.filter(c => c.unavailable).length}}, 200, 120);
       }
       if (!parts[4]) {
         const [m, st] = await Promise.all([

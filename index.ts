@@ -209,7 +209,7 @@ function observe(){if(S.io)S.io.disconnect();S.io=new IntersectionObserver(es=>{
 function renderEnd(){const r=S.rd,nl=navList(),pv=r.idx>=0&&nl[r.idx+1],nx=r.idx>=0&&nl[r.idx-1];$('#prevCh').disabled=!pv;$('#nextCh').disabled=!nx;
 $('#endReader').innerHTML='<div class="muted">Fim do capítulo '+esc(r.ch||'')+'</div><div class="endbtns"><button class="btn outline" data-ch="-1"'+(pv?'':' disabled')+'>‹ Anterior</button><button class="btn primary" data-ch="1"'+(nx?'':' disabled')+'>'+(nx?'Próximo capítulo ›':'Último capítulo')+'</button></div><a class="btn outline" href="#/m/'+r.mid+'">Ver todos os capítulos</a>'}
 function showPage(i){const arr=cur();S.page=Math.max(0,Math.min(arr.length-1,i));$('#pages').innerHTML='<img src="'+esc(arr[S.page])+'" alt="Página '+(S.page+1)+'">';[1,2].forEach(k=>{if(arr[S.page+k])new Image().src=arr[S.page+k]});$('#endReader').classList.toggle('hidden',S.page<arr.length-1);window.scrollTo(0,0);progress()}
-function renderPages(){const r=S.rd;if(!r)return;const arr=cur(),box=$('#pages');box.classList.toggle('single',P.mode==='page');$('#modeBtn').textContent=P.mode==='page'?'▭':'↕';$('#saverBtn').textContent=P.saver?'Eco':'HD';
+function renderPages(){const r=S.rd;if(!r)return;$('#modeBtn').disabled=false;$('#saverBtn').disabled=false;const arr=cur(),box=$('#pages');box.classList.toggle('single',P.mode==='page');$('#modeBtn').textContent=P.mode==='page'?'▭':'↕';$('#saverBtn').textContent=P.saver?'Eco':'HD';
 if(!arr.length){box.innerHTML='';$('#pageStatus').textContent='Este capítulo não tem páginas disponíveis.';return}$('#pageStatus').textContent='';
 if(P.mode==='page'){showPage(S.page)}else{if(S.io)S.io.disconnect();box.innerHTML=arr.map((u,i)=>'<img data-i="'+i+'" loading="'+(i<=S.page+2?'eager':'lazy')+'" src="'+esc(u)+'" alt="Página '+(i+1)+'">').join('');observe();$('#endReader').classList.remove('hidden');if(S.page>0)setTimeout(()=>{const im=$$('#pages img')[S.page];if(im)im.scrollIntoView()},350)}
 progress()}
@@ -407,7 +407,7 @@ function simp(m, full) {
   return o;
 }
 
-Bun.serve({hostname: "0.0.0.0", port: 3000, async fetch(req) {
+Bun.serve({hostname: "0.0.0.0", port: 3000, maxRequestBodySize: 100 * 1024 * 1024, async fetch(req) {
   const u = new URL(req.url), p = u.pathname, q = u.searchParams;
   if (req.method === "OPTIONS") return new Response(null, {headers: cors});
   if (p === "/") return new Response(html, {headers: {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"}});
@@ -539,7 +539,7 @@ Bun.serve({hostname: "0.0.0.0", port: 3000, async fetch(req) {
       const uploads=form.getAll("pages").filter(x=>x instanceof File&&x.size>0);
       if(!uploads.length||uploads.length>100)return J({error:"Envie entre 1 e 100 páginas"},400,0);
       if(uploads.some(x=>!(["image/jpeg","image/png","image/webp","image/avif"].includes(x.type))||x.size>12*1024*1024))return J({error:"Use imagens JPG, PNG, WebP ou AVIF de até 12 MB cada"},400,0);
-      if(uploads.reduce((n,x)=>n+x.size,0)>250*1024*1024)return J({error:"O envio ultrapassa 250 MB"},413,0);
+      if(uploads.reduce((n,x)=>n+x.size,0)>90*1024*1024)return J({error:"O envio ultrapassa 90 MB por capítulo"},413,0);
       const root=process.env.SCAN_LIBRARY_DIR||"/data/scan-library",workId=title.toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,55)||"obra";
       const libFile=root+"/library.json";await mkdir(root+"/files/"+slug,{recursive:true});
       const lib=await Bun.file(libFile).exists()?await Bun.file(libFile).json():{works:[]};

@@ -505,7 +505,52 @@ Bun.serve({hostname: "0.0.0.0", port: 3000, async fetch(req) {
         saver: (at.chapter.dataSaver || []).map(f => base + "/data-saver/" + h + "/" + enc(f))
       }, 200, 120);
     }
-    if (p === "/api/library" && req.method === "GET") {\n      const scans = await Bun.file(new URL("./scans.json", import.meta.url)).json();\n      const libPath = (process.env.SCAN_LIBRARY_DIR || "/data/scan-library") + "/library.json";\n      const lib = await Bun.file(libPath).exists() ? await Bun.file(libPath).json() : {works: []};\n      const slug = (q.get("scan") || "").trim();\n      const data = lib.works.filter(w => !slug || w.scanSlug === slug).map(w => ({...w, chapters: [...w.chapters].sort((a,b) => (Number(b.number)||0)-(Number(a.number)||0)).map(c => ({id:c.id,number:c.number,title:c.title,pages:c.files.length,createdAt:c.createdAt}))}));\n      return J({data: data.map(w => ({...w, scanName: (scans.find(s=>s.slug===w.scanSlug)||{}).name || w.scanSlug}))}, 200, 15);\n    }\n    if (p === "/api/library/chapter" && req.method === "GET") {\n      const libPath = (process.env.SCAN_LIBRARY_DIR || "/data/scan-library") + "/library.json";\n      const lib = await Bun.file(libPath).exists() ? await Bun.file(libPath).json() : {works: []};\n      const slug=q.get("scan"),workId=q.get("work"),chapterId=q.get("chapter");\n      const w=lib.works.find(x=>x.scanSlug===slug&&x.id===workId),c=w&&w.chapters.find(x=>x.id===chapterId);\n      if(!w||!c)return J({error:"Obra ou capítulo não encontrado"},404,0);\n      const scans=await Bun.file(new URL("./scans.json",import.meta.url)).json(),scan=scans.find(x=>x.slug===slug);\n      return J({scanName:scan?scan.name:slug,workTitle:w.title,number:c.number,title:c.title,pages:c.files.map(f=>"/media/"+encodeURIComponent(slug)+"/"+encodeURIComponent(w.id)+"/"+encodeURIComponent(c.id)+"/"+encodeURIComponent(f))},200,0);\n    }\n    if (p.startsWith("/media/")) {\n      const bits=p.split("/").slice(2).map(decodeURIComponent);\n      if(bits.length!==4||bits.some(x=>! /^[a-zA-Z0-9._-]{1,120}$/.test(x)))return new Response("Not found",{status:404});\n      const file=Bun.file((process.env.SCAN_LIBRARY_DIR||"/data/scan-library")+"/files/"+bits.join("/"));\n      if(!await file.exists())return new Response("Not found",{status:404});\n      return new Response(file,{headers:{"Content-Type":file.type||"application/octet-stream","Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});\n    }\n    if (p === "/api/admin/scan-upload" && req.method === "POST") {\n      const expected=process.env.SCAN_UPLOAD_TOKEN||"";\n      if(!expected||req.headers.get("authorization")!=="Bearer "+expected)return J({error:"Chave de publicação inválida"},401,0);\n      const form=await req.formData(),slug=String(form.get("scanSlug")||""),title=String(form.get("title")||"").trim(),description=String(form.get("description")||"").trim().slice(0,600),number=String(form.get("chapter")||"").trim(),chapterTitle=String(form.get("chapterTitle")||"").trim().slice(0,160),authorized=String(form.get("authorized")||"");\n      const scans=await Bun.file(new URL("./scans.json",import.meta.url)).json();\n      if(!scans.some(s=>s.slug===slug&&s.status!=="inactive"))return J({error:"Scan não cadastrada ou inativa"},400,0);\n      if(!title||!number||authorized!=="yes")return J({error:"Informe a obra, o capítulo e confirme a autorização de publicação"},400,0);\n      const uploads=form.getAll("pages").filter(x=>x instanceof File&&x.size>0);\n      if(!uploads.length||uploads.length>100)return J({error:"Envie entre 1 e 100 páginas"},400,0);\n      if(uploads.some(x=>!(["image/jpeg","image/png","image/webp","image/avif"].includes(x.type))||x.size>12*1024*1024))return J({error:"Use imagens JPG, PNG, WebP ou AVIF de até 12 MB cada"},400,0);\n      if(uploads.reduce((n,x)=>n+x.size,0)>250*1024*1024)return J({error:"O envio ultrapassa 250 MB"},413,0);\n      const root=process.env.SCAN_LIBRARY_DIR||"/data/scan-library",workId=title.toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,55)||"obra";\n      const libFile=root+"/library.json";await mkdir(root+"/files/"+slug,{recursive:true});\n      const lib=await Bun.file(libFile).exists()?await Bun.file(libFile).json():{works:[]};\n      let work=lib.works.find(w=>w.scanSlug===slug&&w.slug===workId);\n      if(!work){work={id:workId+"-"+crypto.randomUUID().slice(0,8),slug:workId,scanSlug:slug,title,description,createdAt:new Date().toISOString(),chapters:[]};lib.works.push(work)}\n      const chapterId="ch-"+crypto.randomUUID().slice(0,12),dir=root+"/files/"+slug+"/"+work.id+"/"+chapterId;await mkdir(dir,{recursive:true});const files=[];\n      for(let i=0;i<uploads.length;i++){const ext=({"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/avif":"avif"})[uploads[i].type],name=String(i+1).padStart(3,"0")+"."+ext;await Bun.write(dir+"/"+name,uploads[i]);files.push(name)}\n      work.chapters.push({id:chapterId,number,title:chapterTitle,files,createdAt:new Date().toISOString()});\n      await Bun.write(libFile,JSON.stringify(lib,null,2));return J({ok:true,workId:work.id,chapterId,pages:files.length},201,0);\n    }\n    if (p === "/api/scans") {
+    if (p === "/api/library" && req.method === "GET") {
+      const scans = await Bun.file(new URL("./scans.json", import.meta.url)).json();
+      const libPath = (process.env.SCAN_LIBRARY_DIR || "/data/scan-library") + "/library.json";
+      const lib = await Bun.file(libPath).exists() ? await Bun.file(libPath).json() : {works: []};
+      const slug = (q.get("scan") || "").trim();
+      const data = lib.works.filter(w => !slug || w.scanSlug === slug).map(w => ({...w, chapters: [...w.chapters].sort((a,b) => (Number(b.number)||0)-(Number(a.number)||0)).map(c => ({id:c.id,number:c.number,title:c.title,pages:c.files.length,createdAt:c.createdAt}))}));
+      return J({data: data.map(w => ({...w, scanName: (scans.find(s=>s.slug===w.scanSlug)||{}).name || w.scanSlug}))}, 200, 15);
+    }
+    if (p === "/api/library/chapter" && req.method === "GET") {
+      const libPath = (process.env.SCAN_LIBRARY_DIR || "/data/scan-library") + "/library.json";
+      const lib = await Bun.file(libPath).exists() ? await Bun.file(libPath).json() : {works: []};
+      const slug=q.get("scan"),workId=q.get("work"),chapterId=q.get("chapter");
+      const w=lib.works.find(x=>x.scanSlug===slug&&x.id===workId),c=w&&w.chapters.find(x=>x.id===chapterId);
+      if(!w||!c)return J({error:"Obra ou capítulo não encontrado"},404,0);
+      const scans=await Bun.file(new URL("./scans.json",import.meta.url)).json(),scan=scans.find(x=>x.slug===slug);
+      return J({scanName:scan?scan.name:slug,workTitle:w.title,number:c.number,title:c.title,pages:c.files.map(f=>"/media/"+encodeURIComponent(slug)+"/"+encodeURIComponent(w.id)+"/"+encodeURIComponent(c.id)+"/"+encodeURIComponent(f))},200,0);
+    }
+    if (p.startsWith("/media/")) {
+      const bits=p.split("/").slice(2).map(decodeURIComponent);
+      if(bits.length!==4||bits.some(x=>! /^[a-zA-Z0-9._-]{1,120}$/.test(x)))return new Response("Not found",{status:404});
+      const file=Bun.file((process.env.SCAN_LIBRARY_DIR||"/data/scan-library")+"/files/"+bits.join("/"));
+      if(!await file.exists())return new Response("Not found",{status:404});
+      return new Response(file,{headers:{"Content-Type":file.type||"application/octet-stream","Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
+    }
+    if (p === "/api/admin/scan-upload" && req.method === "POST") {
+      const expected=process.env.SCAN_UPLOAD_TOKEN||"";
+      if(!expected||req.headers.get("authorization")!=="Bearer "+expected)return J({error:"Chave de publicação inválida"},401,0);
+      const form=await req.formData(),slug=String(form.get("scanSlug")||""),title=String(form.get("title")||"").trim(),description=String(form.get("description")||"").trim().slice(0,600),number=String(form.get("chapter")||"").trim(),chapterTitle=String(form.get("chapterTitle")||"").trim().slice(0,160),authorized=String(form.get("authorized")||"");
+      const scans=await Bun.file(new URL("./scans.json",import.meta.url)).json();
+      if(!scans.some(s=>s.slug===slug&&s.status!=="inactive"))return J({error:"Scan não cadastrada ou inativa"},400,0);
+      if(!title||!number||authorized!=="yes")return J({error:"Informe a obra, o capítulo e confirme a autorização de publicação"},400,0);
+      const uploads=form.getAll("pages").filter(x=>x instanceof File&&x.size>0);
+      if(!uploads.length||uploads.length>100)return J({error:"Envie entre 1 e 100 páginas"},400,0);
+      if(uploads.some(x=>!(["image/jpeg","image/png","image/webp","image/avif"].includes(x.type))||x.size>12*1024*1024))return J({error:"Use imagens JPG, PNG, WebP ou AVIF de até 12 MB cada"},400,0);
+      if(uploads.reduce((n,x)=>n+x.size,0)>250*1024*1024)return J({error:"O envio ultrapassa 250 MB"},413,0);
+      const root=process.env.SCAN_LIBRARY_DIR||"/data/scan-library",workId=title.toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,55)||"obra";
+      const libFile=root+"/library.json";await mkdir(root+"/files/"+slug,{recursive:true});
+      const lib=await Bun.file(libFile).exists()?await Bun.file(libFile).json():{works:[]};
+      let work=lib.works.find(w=>w.scanSlug===slug&&w.slug===workId);
+      if(!work){work={id:workId+"-"+crypto.randomUUID().slice(0,8),slug:workId,scanSlug:slug,title,description,createdAt:new Date().toISOString(),chapters:[]};lib.works.push(work)}
+      const chapterId="ch-"+crypto.randomUUID().slice(0,12),dir=root+"/files/"+slug+"/"+work.id+"/"+chapterId;await mkdir(dir,{recursive:true});const files=[];
+      for(let i=0;i<uploads.length;i++){const ext=({"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/avif":"avif"})[uploads[i].type],name=String(i+1).padStart(3,"0")+"."+ext;await Bun.write(dir+"/"+name,uploads[i]);files.push(name)}
+      work.chapters.push({id:chapterId,number,title:chapterTitle,files,createdAt:new Date().toISOString()});
+      await Bun.write(libFile,JSON.stringify(lib,null,2));return J({ok:true,workId:work.id,chapterId,pages:files.length},201,0);
+    }
+    if (p === "/api/scans") {
       const scans = await Bun.file(new URL("./scans.json", import.meta.url)).json();
       const slug = (q.get("slug") || "").trim();
       return J({data: slug ? scans.filter(s => s.slug === slug) : scans}, 200, 300);

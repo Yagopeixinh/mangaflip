@@ -1,0 +1,70 @@
+[
+  {
+    "slug": "silence-scan",
+    "name": "Silence Scan",
+    "description": "Grupo brasileiro de tradução. Mantém canais públicos para leitor, redes sociais, comunidade e recrutamento.",
+    "language": ["pt-br"],
+    "status": "public",
+    "links": [
+      {"label": "Central de links", "url": "https://silencescan.com.br/links", "kind": "community"},
+      {"label": "Linktree oficial", "url": "https://linktr.ee/SilenceScan", "kind": "community"}
+    ],
+    "catalogUrl": "https://silencescan.com.br/links",
+    "integration": "external",
+    "note": "Catálogo e capítulos ainda não possuem feed/API pública confirmada; por enquanto, o MangaFlip direciona ao canal do grupo."
+  },
+  {
+    "slug": "sinensis-scan",
+    "name": "Sinensis Scan",
+    "description": "Equipe focada em manhwas coreanos, com canais públicos de atualizações e comunidade.",
+    "language": ["pt-br"],
+    "status": "public",
+    "links": [
+      {"label": "Site de leitura", "url": "https://loverstoon.com", "kind": "catalog"},
+      {"label": "Telegram de atualizações", "url": "https://t.me/s/sinensisscan", "kind": "community"},
+      {"label": "Facebook", "url": "https://www.facebook.com/SinensisScan/", "kind": "community"}
+    ],
+    "catalogUrl": "https://loverstoon.com",
+    "integration": "external",
+    "note": "O canal público informa atualizações e já reportou instabilidade do site. Feed/API para importação automática não foi confirmado."
+  },
+  {
+    "slug": "ninja-scan",
+    "name": "Ninja Scan",
+    "description": "Catálogo em português identificado como plataforma de scanlation, com páginas de séries e capítulos.",
+    "language": ["pt-br"],
+    "status": "needs-review",
+    "links": [
+      {"label": "Site e catálogo", "url": "https://ninjacomics.xyz/", "kind": "catalog"}
+    ],
+    "catalogUrl": "https://ninjacomics.xyz/?s=&post_type=wp-manga",
+    "integration": "external",
+    "note": "Domínio e estrutura de catálogo identificados em um pedido público de suporte ao leitor HakuNeko; vínculo oficial e permissão de integração ainda precisam ser confirmados."
+  },
+  {
+    "slug": "mighty-scan",
+    "name": "Mighty Scan",
+    "description": "Comunidade brasileira de traduções com servidor público no Discord.",
+    "language": ["pt-br"],
+    "status": "community",
+    "links": [
+      {"label": "Discord da comunidade", "url": "https://discord.com/servers/1233481736302755850", "kind": "community"}
+    ],
+    "catalogUrl": "https://discord.com/servers/1233481736302755850",
+    "integration": "community",
+    "note": "A presença pública confirmada é a comunidade no Discord; catálogo/feed de capítulos acessível sem login não foi confirmado."
+  },
+  {
+    "slug": "imperio-scans",
+    "name": "Império Scans",
+    "description": "Grupo de tradução de mangás do inglês para o português, com comunidade pública.",
+    "language": ["pt-br"],
+    "status": "community",
+    "links": [
+      {"label": "Discord da comunidade", "url": "https://discord.me/imperioscans", "kind": "community"}
+    ],
+    "catalogUrl": "https://discord.me/imperioscans",
+    "integration": "community",
+    "note": "A comunidade pública foi localizada; site próprio e feed/API de capítulos ainda precisam ser confirmados."
+  }
+]

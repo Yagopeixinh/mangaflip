@@ -71,7 +71,7 @@ kbd{background:#2b1d3a;border:1px solid var(--line);border-radius:5px;padding:1p
 :root[data-theme="light"]{color-scheme:light;--bg:#f4f1f8;--panel:#fff;--panel2:#eee9f4;--line:#d8cfe2;--text:#241b2d;--muted:#71667b;--accent:#8542b8;--accent2:#7132a5}
 :root[data-theme="light"] .top{background:#f4f1f8f2}:root[data-theme="light"] .field,:root[data-theme="light"] .searchbar input{background:#fff;color:#241b2d}:root[data-theme="light"] .bottomnav{background:#fffffff5}
 @media(max-width:520px){.themegrid{grid-template-columns:repeat(2,minmax(0,1fr))}.settingrow{align-items:flex-start;flex-direction:column}.settingrow select{max-width:100%;width:100%}.bottomnav button{font-size:10px;padding:0 3px}}
-.history-card{position:relative}.history-remove{position:absolute;top:7px;right:7px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#100b18eF;color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s,background .15s;z-index:2}.history-card:hover .history-remove,.history-card:focus-within .history-remove{opacity:1}.history-remove:hover{background:var(--accent);color:#fff}@media(hover:none){.history-remove{opacity:1}}@media(prefers-reduced-motion:reduce){.history-remove{transition:none}}
+.scan-card{padding:14px;display:flex;flex-direction:column;gap:8px}.scan-card h3{margin:0;font-size:16px}.scan-card p{margin:0}.scan-status{font-size:11px;color:var(--muted)}.scan-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.scan-links a{font-size:13px}.history-card{position:relative}.history-remove{position:absolute;top:7px;right:7px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#100b18eF;color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s,background .15s;z-index:2}.history-card:hover .history-remove,.history-card:focus-within .history-remove{opacity:1}.history-remove:hover{background:var(--accent);color:#fff}@media(hover:none){.history-remove{opacity:1}}@media(prefers-reduced-motion:reduce){.history-remove{transition:none}}
 </style></head>
 <body>
 <header class="top"><div class="shell topin"><a class="logo" href="#/" aria-label="MangáFlip — início"><svg viewBox="0 0 230 54" role="img" aria-labelledby="mangaflipLogoTitle"><title id="mangaflipLogoTitle">MangáFlip</title><g transform="translate(2 5)"><path d="M2 8 Q17 2 31 11 V39 Q17 31 2 37Z" fill="#f7f2fb" stroke="#e7dcef" stroke-width="1.5"/><path d="M31 11 Q45 2 60 8 V37 Q45 31 31 39Z" fill="#fff" stroke="#e7dcef" stroke-width="1.5"/><path d="M31 11 V39" stroke="#d94b55" stroke-width="2"/><path d="M7 13 Q17 9 26 15 M7 19 Q17 15 26 21 M36 15 Q46 9 55 13 M36 21 Q46 15 55 19" fill="none" stroke="#33263d" stroke-width="1.6" stroke-linecap="round"/><path d="M5 5 L5 1 M57 5 L57 1" stroke="#d94b55" stroke-width="2" stroke-linecap="round"/></g><text x="72" y="35" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="-1" fill="#f7f2fb">Manga</text><text x="157" y="35" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="-1" fill="#e45b65">Flip</text></svg></a><div class="right"><span id="net">Conectando…</span><button class="btn outline" id="randBtn" title="Mangá aleatório">🎲</button><button class="btn outline" id="refresh" title="Atualizar">↻</button></div></div>
@@ -92,7 +92,14 @@ kbd{background:#2b1d3a;border:1px solid var(--line);border-radius:5px;padding:1p
 <div class="chips" id="tags"></div><div id="catalogGrid" class="grid"></div><div class="toolbar"><button class="btn outline hidden" id="more">Carregar mais</button></div></section>
 <section id="library" class="hidden"><div class="sectionhead"><h2>Minha biblioteca</h2><span class="small muted" id="libCount"></span></div>
 <div class="toolbar"><button class="chip active" data-lib="fav">♥ Favoritos</button><button class="chip" data-lib="hist">⏱ Histórico</button><span class="grow"></span><button class="btn outline sm" id="expBtn">Exportar</button><button class="btn outline sm" id="impBtn">Importar</button><input type="file" id="impFile" accept="application/json" hidden></div><div id="libBody"></div></section>
-<section id="scans" class="hidden"><div class="sectionhead"><h2>Grupos de tradução</h2><span class="small muted">MangaDex</span></div><p class="muted small">Grupos listados conforme o catálogo público. A disponibilidade de capítulos varia por obra e idioma.</p><form id="groupForm" class="searchbar"><input id="groupSearch" placeholder="Pesquisar grupo de scan…"><button class="btn primary">Buscar</button></form><div id="groups" style="margin-top:10px"></div></section>
+<section id="scans" class="hidden">
+<div class="sectionhead"><h2>Scans independentes</h2><span class="small muted" id="scanCount"></span></div>
+<p class="muted small">Equipes independentes, seus próprios canais e catálogos. O MangaFlip não presume parceria nem copia capítulos: cada scan controla sua publicação.</p>
+<form id="scanSearchForm" class="searchbar"><input id="scanSearch" placeholder="Buscar scan pelo nome…" autocomplete="off"><button class="btn primary">Buscar</button></form>
+<div class="toolbar"><select id="scanStatus"><option value="">Todas as equipes</option><option value="public">Catálogo/canais públicos</option><option value="community">Comunidade</option><option value="review">A confirmar</option><option value="inactive">Inativas (arquivo)</option></select></div>
+<div id="scanCards" class="grid"></div>
+<div id="scanProfile" class="hidden"></div>
+</section>
 <section id="detail" class="hidden"><button class="btn outline sm" data-back>← Voltar</button><div id="detailContent"></div>
 <div class="sectionhead"><h2>Capítulos <span class="small muted" id="chCount"></span></h2><div class="right"><select id="chLang" class="field" style="width:auto;padding:8px"></select><button class="btn outline sm" id="chOrder">↓ Recentes</button></div></div>
 <div class="small muted hidden" id="chNote" style="margin-bottom:8px"></div><button class="btn outline sm hidden" id="unavBtn" style="margin-bottom:8px">Ocultar indisponíveis</button>
@@ -218,7 +225,9 @@ function pageGo(d){const t=S.page+d;if(t<0)return;if(t>=cur().length){goChapter(
 function renderLibrary(){$$('[data-lib]').forEach(b=>b.classList.toggle('active',b.dataset.lib===S.lib));const b=$('#libBody');
 if(S.lib==='fav'){const l=favs();$('#libCount').textContent=l.length+' obras';b.innerHTML=l.length?'<div class="grid">'+l.map(card).join('')+'</div>':'<div class="empty">Você ainda não favoritou nada. Toque no ♡ de qualquer capa para salvar aqui.</div>'}
 else{const l=hist();$('#libCount').textContent=l.length+' leituras';b.innerHTML=l.length?l.map(h=>'<a class="chapter" href="#/r/'+h.id+'/'+h.cid+'"><span class="hrow"><img src="'+esc(cover(h,256))+'" alt=""><span><b>'+esc(h.title)+'</b><br><span class="small muted">Cap. '+esc(h.ch||'?')+' · pág. '+(h.page+1)+'/'+(h.total||'?')+'</span></span></span><span class="small muted">'+ago(h.t)+'</span></a>').join('')+'<button class="btn outline sm" id="clrHist">Limpar hist\u00f3rico</button>':'<div class="empty">Seu hist\u00f3rico aparece aqui quando você começar a ler.</div>'}}
-async function loadGroups(){S.groupsLoaded=1;const el=$('#groups');el.innerHTML='<div class="loading">Buscando grupos…</div>';try{const d=await api('/api/groups?q='+encodeURIComponent($('#groupSearch').value.trim()));el.innerHTML=d.data.map(g=>'<div class="chapter"><span><b>'+esc(g.name||'Grupo sem nome')+'</b><br><span class="small muted">'+esc((g.description||'Grupo MangaDex').slice(0,140))+'</span></span><a href="https://mangadex.org/group/'+esc(g.id)+'" target="_blank" rel="noopener">MangaDex ↗</a></div>').join('')||'<div class="empty">Nenhum grupo encontrado.</div>'}catch(e){el.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}}
+let scanCache=[];async function loadScans(){S.groupsLoaded=1;const el=$('#scanCards');el.innerHTML='<div class="loading">Carregando diretório de scans…</div>';try{const d=await api('/api/scans');scanCache=d.data||[];renderScans()}catch(e){el.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}}
+function renderScans(){const q=$('#scanSearch').value.trim().toLowerCase(),st=$('#scanStatus').value;const list=scanCache.filter(s=>(!st||s.status===st)&&(!q||s.name.toLowerCase().includes(q)||s.description.toLowerCase().includes(q)));$('#scanCount').textContent=list.length+' equipes';$('#scanCards').classList.remove('hidden');$('#scanProfile').classList.add('hidden');$('#scanCards').innerHTML=list.map(s=>'<article class="card scan-card"><div class="scan-status">'+esc(({public:'Canais públicos',community:'Comunidade',review:'Atividade a confirmar',inactive:'Inativa · arquivo'}[s.status]||'Scan'))+'</div><h3>'+esc(s.name)+'</h3><p class="small muted">'+esc(s.description)+'</p><p class="small">'+esc(s.activity||'')+'</p><div class="scan-links"><a href="#/scan/'+encodeURIComponent(s.slug)+'">Ver perfil →</a>'+(s.catalogUrl?'<a href="'+esc(s.catalogUrl)+'" target="_blank" rel="noopener noreferrer">Abrir fonte ↗</a>':'')+'</div></article>').join('')||'<div class="empty" style="grid-column:1/-1">Nenhuma scan encontrada.</div>'}
+async function openScan(slug){show('scans');if(!scanCache.length)await loadScans();const s=scanCache.find(x=>x.slug===slug);const cards=$('#scanCards'),profile=$('#scanProfile');if(!s){toast('Scan não encontrada no diretório');return}cards.classList.add('hidden');profile.classList.remove('hidden');profile.innerHTML='<button class="btn outline sm" id="backScans">← Todas as scans</button><div class="sectionhead"><h2>'+esc(s.name)+'</h2><span class="scan-status">'+esc(({public:'Canais públicos',community:'Comunidade',review:'A confirmar',inactive:'Inativa · arquivo'}[s.status]||'Scan'))+'</span></div><div class="notice"><p>'+esc(s.description)+'</p><p class="small muted">'+esc(s.activity||'')+'</p><p>'+esc(s.note||'')+'</p></div><div class="sectionhead"><h3>Publicações e canais da equipe</h3></div><div class="notice"><p>O MangaFlip ainda não recebeu um feed/API autorizado desta equipe. Por enquanto, estes são os canais públicos indicados pela própria presença online localizada.</p><div class="scan-links">'+(s.links||[]).map(l=>'<a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+' ↗</a>').join('')+'</div></div><p class="small muted">Integração: '+esc(s.integration==='community'?'comunidade; precisa de um canal autorizado': 'links externos; feed/API ainda não confirmado')+'</p>';$('#backScans').onclick=()=>{location.hash='#/scans'};document.title=s.name+' · Scans · MangáFlip'}
 function exportData(){const o={v:1,fav:favs(),hist:hist(),read:store.get('read',{}),prefs:P};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download='manga-hub-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 function importData(txt){try{const o=JSON.parse(txt);const f=favs();(o.fav||[]).forEach(x=>{if(x&&isId(x.id)&&!f.some(y=>y.id===x.id))f.push(x)});store.set('fav',f);
 const h=hist();(o.hist||[]).forEach(x=>{if(!x||!isId(x.id))return;const i=h.findIndex(y=>y.id===x.id);if(i<0)h.push(x);else if((x.t||0)>(h[i].t||0))h[i]=x});h.sort((a,b)=>(b.t||0)-(a.t||0));store.set('hist',h.slice(0,40));
@@ -245,11 +254,11 @@ let steps=0;
 function go(t){const h=t==='home'?'#/':'#/'+t;if(location.hash===h||(t==='home'&&!location.hash))route();else location.hash=h}
 function show(tab){S.tab=tab;['home','catalog','library','scans','detail','reader','about','settings'].forEach(x=>$('#'+x).classList.toggle('hidden',x!==tab));$$('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.body.classList.toggle('reading',tab==='reader');if(tab!=='reader')leaveReader();if(tab!=='detail'&&tab!=='reader')document.title='MangáFlip';window.scrollTo(0,0)}
 function route(){const p=location.hash.replace(/^#\/?/,'').split('/'),r=p[0]||'home';
-if(r==='m'&&isId(p[1]))return openManga(p[1]);if(r==='r'&&isId(p[1])&&isId(p[2]))return openReader(p[1],p[2]);
+if(r==='scan'&&p[1])return openScan(decodeURIComponent(p[1]));if(r==='m'&&isId(p[1]))return openManga(p[1]);if(r==='r'&&isId(p[1])&&isId(p[2]))return openReader(p[1],p[2]);
 const t=['home','catalog','library','scans','about','settings'].includes(r)?r:'home';show(t);
 if(t==='home'){renderContinue();if(!S.homeLoaded){S.homeLoaded=1;loadHome()}}
 else if(t==='catalog'){if(!S.catLoaded){S.catLoaded=1;loadTags();renderTags();searchCatalog(true)}}
-else if(t==='library')renderLibrary();else if(t==='scans'&&!S.groupsLoaded)loadGroups();else if(t==='settings')applyTheme()}
+else if(t==='library')renderLibrary();else if(t==='scans'&&!S.groupsLoaded)loadScans();else if(t==='settings')applyTheme()}
 /* ---------- eventos ---------- */
 document.addEventListener('click',e=>{const t=e.target;let x;
 if(x=t.closest('[data-remove-history]')){e.preventDefault();e.stopPropagation();removeHistory(x.dataset.removeHistory);return}
@@ -281,13 +290,13 @@ $('#catalogForm').onsubmit=e=>{e.preventDefault();searchCatalog(true)};
 let dt;$('#catalogSearch').oninput=()=>{clearTimeout(dt);dt=setTimeout(()=>searchCatalog(true),550)};
 ['#fSort','#fOrigin','#fLang','#fStatus'].forEach(s=>{$(s).onchange=()=>searchCatalog(true)});
 $('#more').onclick=()=>searchCatalog(false);
-$('#groupForm').onsubmit=e=>{e.preventDefault();loadGroups()};
+$('#scanSearchForm').onsubmit=e=>{e.preventDefault();renderScans()};$('#scanSearch').oninput=renderScans;$('#scanStatus').onchange=renderScans;
 $('#chLang').onchange=()=>{S.lang=$('#chLang').value;P.lang=S.lang;store.set('prefs',P);loadChapters(true)};
 $('#chOrder').onclick=()=>{S.order=S.order==='desc'?'asc':'desc';$('#chOrder').textContent=S.order==='desc'?'↓ Recentes':'↑ Antigos';renderChapters()};
 $('#chFind').oninput=renderChapters;$('#unavBtn').onclick=()=>{P.showUnavailable=P.showUnavailable===false;store.set('prefs',P);renderChapters()};
 $('#moreChapters').onclick=()=>loadChapters(false);
 $('#randBtn').onclick=async()=>{try{const m=await api('/api/random');location.hash='#/m/'+m.id}catch(e){toast('Não foi possível sortear agora')}};
-$('#refresh').onclick=()=>{if(S.tab==='home')loadHome();else if(S.tab==='catalog')searchCatalog(true);else if(S.tab==='scans')loadGroups();else if(S.tab==='library')renderLibrary();else route()};
+$('#refresh').onclick=()=>{if(S.tab==='home')loadHome();else if(S.tab==='catalog')searchCatalog(true);else if(S.tab==='scans')loadScans();else if(S.tab==='library')renderLibrary();else route()};
 $('#closeReader').onclick=()=>{location.hash='#/m/'+(S.rd?S.rd.mid:(S.manga?S.manga.id:''))};
 $('#prevCh').onclick=()=>goChapter(-1);$('#nextCh').onclick=()=>goChapter(1);
 $('#modeBtn').onclick=()=>{P.mode=P.mode==='page'?'scroll':'page';store.set('prefs',P);toast(P.mode==='page'?'Modo página a página':'Modo rolagem contínua');renderPages()};
@@ -490,12 +499,10 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
         saver: (at.chapter.dataSaver || []).map(f => base + "/data-saver/" + h + "/" + enc(f))
       }, 200, 120);
     }
-    if (p === "/api/groups") {
-      const s = new URLSearchParams({limit: "40", "order[followedCount]": "desc"});
-      const n = (q.get("q") || "").trim().slice(0, 80); if (n) s.set("name", n);
-      const qs = s.toString();
-      const d = await cached("g:" + qs, 300, () => md("/group?" + qs));
-      return J({data: d.data.map(g => ({id: g.id, name: g.attributes.name, description: g.attributes.description || ""}))}, 200, 300);
+    if (p === "/api/scans") {
+      const scans = await Bun.file(new URL("./scans.json", import.meta.url)).json();
+      const slug = (q.get("slug") || "").trim();
+      return J({data: slug ? scans.filter(s => s.slug === slug) : scans}, 200, 300);
     }
     if (p === "/api/anilist") {
       const page = clamp(Number(q.get("page")) || 1, 1, 50);

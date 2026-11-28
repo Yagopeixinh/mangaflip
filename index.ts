@@ -1,3 +1,5 @@
+import { mkdir } from "node:fs/promises";
+
 const html = String.raw`<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -71,7 +73,7 @@ kbd{background:#2b1d3a;border:1px solid var(--line);border-radius:5px;padding:1p
 :root[data-theme="light"]{color-scheme:light;--bg:#f4f1f8;--panel:#fff;--panel2:#eee9f4;--line:#d8cfe2;--text:#241b2d;--muted:#71667b;--accent:#8542b8;--accent2:#7132a5}
 :root[data-theme="light"] .top{background:#f4f1f8f2}:root[data-theme="light"] .field,:root[data-theme="light"] .searchbar input{background:#fff;color:#241b2d}:root[data-theme="light"] .bottomnav{background:#fffffff5}
 @media(max-width:520px){.themegrid{grid-template-columns:repeat(2,minmax(0,1fr))}.settingrow{align-items:flex-start;flex-direction:column}.settingrow select{max-width:100%;width:100%}.bottomnav button{font-size:10px;padding:0 3px}}
-.history-card{position:relative}.history-remove{position:absolute;top:7px;right:7px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#100b18eF;color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s,background .15s;z-index:2}.history-card:hover .history-remove,.history-card:focus-within .history-remove{opacity:1}.history-remove:hover{background:var(--accent);color:#fff}@media(hover:none){.history-remove{opacity:1}}@media(prefers-reduced-motion:reduce){.history-remove{transition:none}}
+.scan-card{padding:14px;display:flex;flex-direction:column;gap:8px}.scan-card h3{margin:0;font-size:16px}.scan-card p{margin:0}.scan-status{font-size:11px;color:var(--muted)}.scan-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.scan-links a{font-size:13px}.history-card{position:relative}.history-remove{position:absolute;top:7px;right:7px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:#100b18eF;color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s,background .15s;z-index:2}.history-card:hover .history-remove,.history-card:focus-within .history-remove{opacity:1}.history-remove:hover{background:var(--accent);color:#fff}@media(hover:none){.history-remove{opacity:1}}@media(prefers-reduced-motion:reduce){.history-remove{transition:none}}
 </style></head>
 <body>
 <header class="top"><div class="shell topin"><a class="logo" href="#/" aria-label="MangáFlip — início"><svg viewBox="0 0 230 54" role="img" aria-labelledby="mangaflipLogoTitle"><title id="mangaflipLogoTitle">MangáFlip</title><g transform="translate(2 5)"><path d="M2 8 Q17 2 31 11 V39 Q17 31 2 37Z" fill="#f7f2fb" stroke="#e7dcef" stroke-width="1.5"/><path d="M31 11 Q45 2 60 8 V37 Q45 31 31 39Z" fill="#fff" stroke="#e7dcef" stroke-width="1.5"/><path d="M31 11 V39" stroke="#d94b55" stroke-width="2"/><path d="M7 13 Q17 9 26 15 M7 19 Q17 15 26 21 M36 15 Q46 9 55 13 M36 21 Q46 15 55 19" fill="none" stroke="#33263d" stroke-width="1.6" stroke-linecap="round"/><path d="M5 5 L5 1 M57 5 L57 1" stroke="#d94b55" stroke-width="2" stroke-linecap="round"/></g><text x="72" y="35" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="-1" fill="#f7f2fb">Manga</text><text x="157" y="35" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="-1" fill="#e45b65">Flip</text></svg></a><div class="right"><span id="net">Conectando…</span><button class="btn outline" id="randBtn" title="Mangá aleatório">🎲</button><button class="btn outline" id="refresh" title="Atualizar">↻</button></div></div>
@@ -92,7 +94,15 @@ kbd{background:#2b1d3a;border:1px solid var(--line);border-radius:5px;padding:1p
 <div class="chips" id="tags"></div><div id="catalogGrid" class="grid"></div><div class="toolbar"><button class="btn outline hidden" id="more">Carregar mais</button></div></section>
 <section id="library" class="hidden"><div class="sectionhead"><h2>Minha biblioteca</h2><span class="small muted" id="libCount"></span></div>
 <div class="toolbar"><button class="chip active" data-lib="fav">♥ Favoritos</button><button class="chip" data-lib="hist">⏱ Histórico</button><span class="grow"></span><button class="btn outline sm" id="expBtn">Exportar</button><button class="btn outline sm" id="impBtn">Importar</button><input type="file" id="impFile" accept="application/json" hidden></div><div id="libBody"></div></section>
-<section id="scans" class="hidden"><div class="sectionhead"><h2>Grupos de tradução</h2><span class="small muted">MangaDex</span></div><p class="muted small">Grupos listados conforme o catálogo público. A disponibilidade de capítulos varia por obra e idioma.</p><form id="groupForm" class="searchbar"><input id="groupSearch" placeholder="Pesquisar grupo de scan…"><button class="btn primary">Buscar</button></form><div id="groups" style="margin-top:10px"></div></section>
+<section id="scans" class="hidden">
+<div class="sectionhead"><h2>Scans independentes</h2><span class="small muted" id="scanCount"></span></div>
+<p class="muted small">Equipes independentes, seus próprios canais e catálogos. O MangaFlip não presume parceria nem copia capítulos: cada scan controla sua publicação.</p>
+<form id="scanSearchForm" class="searchbar"><input id="scanSearch" placeholder="Buscar scan pelo nome…" autocomplete="off"><button class="btn primary">Buscar</button></form>
+<div class="toolbar"><select id="scanStatus"><option value="">Todas as equipes</option><option value="public">Catálogo/canais públicos</option><option value="community">Comunidade</option><option value="review">A confirmar</option><option value="inactive">Inativas (arquivo)</option></select></div>
+<div id="scanCards" class="grid"></div>
+<div id="scanProfile" class="hidden"></div>
+<div id="scanAdmin" class="notice" style="margin-top:18px"><details><summary><b>Área de publicação das scans</b></summary><p class="small muted">A equipe pode enviar uma obra e as páginas de um capítulo. Só publique material que a própria equipe controla ou autorizou expressamente.</p><form id="scanUploadForm"><label class="small">Chave de publicação</label><input class="field" id="scanUploadToken" type="password" autocomplete="off" placeholder="Chave fornecida pelo administrador" required><label class="small">Scan</label><select class="field" id="scanUploadTeam" required></select><label class="small">Nome da obra</label><input class="field" id="scanUploadTitle" maxlength="160" required placeholder="Título do mangá/manhwa"><label class="small">Sinopse (opcional)</label><input class="field" id="scanUploadDesc" maxlength="600" placeholder="Descrição breve"><label class="small">Número do capítulo</label><input class="field" id="scanUploadChapter" maxlength="32" required placeholder="1, 1.5, 10..."><label class="small">Título do capítulo (opcional)</label><input class="field" id="scanUploadChapterTitle" maxlength="160" placeholder="Título"><label class="small">Páginas do capítulo (imagens)</label><input class="field" id="scanUploadFiles" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple required><label class="small"><input id="scanUploadConsent" type="checkbox" required> Confirmo que tenho autorização para publicar estas páginas no MangaFlip.</label><p class="small muted">Envie as imagens na ordem correta. Limite: 100 páginas por envio, até 12 MB por imagem.</p><button class="btn primary" id="scanUploadSubmit">Publicar capítulo</button><span class="small muted" id="scanUploadStatus"></span></form></details></div>
+</section>
 <section id="detail" class="hidden"><button class="btn outline sm" data-back>← Voltar</button><div id="detailContent"></div>
 <div class="sectionhead"><h2>Capítulos <span class="small muted" id="chCount"></span></h2><div class="right"><select id="chLang" class="field" style="width:auto;padding:8px"></select><button class="btn outline sm" id="chOrder">↓ Recentes</button></div></div>
 <div class="small muted hidden" id="chNote" style="margin-bottom:8px"></div><button class="btn outline sm hidden" id="unavBtn" style="margin-bottom:8px">Ocultar indisponíveis</button>
@@ -116,6 +126,7 @@ const isId=s=>/^[0-9a-f-]{36}$/i.test(s||'');
 const store={get(k,d){try{const v=localStorage.getItem('mh.'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('mh.'+k,JSON.stringify(v))}catch(e){}}};
 let P=Object.assign({mode:'scroll',saver:false,lang:'pt-br'},store.get('prefs',{}));
 const S={tab:'home',req:0,nav:0,offset:0,tags:new Set(),tagList:[],manga:null,chapters:[],chOffset:0,chTotal:0,lang:'pt-br',order:'desc',rd:null,page:0,io:null,sv:0,fails:0,lib:'fav',al:'TRENDING_DESC'};
+let scanReadState=null;
 const known={};
 const LANGS={'pt-br':'Português (BR)',pt:'Português (PT)',en:'Inglês',es:'Espanhol','es-la':'Espanhol (LA)',fr:'Francês',it:'Italiano',de:'Alemão',ru:'Russo',id:'Indonésio',tr:'Turco',pl:'Polonês',vi:'Vietnamita',th:'Tailandês',ar:'Árabe',ja:'Japonês',ko:'Coreano',zh:'Chinês'};
 const ORIGIN={ja:'Mangá',ko:'Manhwa',zh:'Manhua','zh-hk':'Manhua'};
@@ -198,7 +209,7 @@ function observe(){if(S.io)S.io.disconnect();S.io=new IntersectionObserver(es=>{
 function renderEnd(){const r=S.rd,nl=navList(),pv=r.idx>=0&&nl[r.idx+1],nx=r.idx>=0&&nl[r.idx-1];$('#prevCh').disabled=!pv;$('#nextCh').disabled=!nx;
 $('#endReader').innerHTML='<div class="muted">Fim do capítulo '+esc(r.ch||'')+'</div><div class="endbtns"><button class="btn outline" data-ch="-1"'+(pv?'':' disabled')+'>‹ Anterior</button><button class="btn primary" data-ch="1"'+(nx?'':' disabled')+'>'+(nx?'Próximo capítulo ›':'Último capítulo')+'</button></div><a class="btn outline" href="#/m/'+r.mid+'">Ver todos os capítulos</a>'}
 function showPage(i){const arr=cur();S.page=Math.max(0,Math.min(arr.length-1,i));$('#pages').innerHTML='<img src="'+esc(arr[S.page])+'" alt="Página '+(S.page+1)+'">';[1,2].forEach(k=>{if(arr[S.page+k])new Image().src=arr[S.page+k]});$('#endReader').classList.toggle('hidden',S.page<arr.length-1);window.scrollTo(0,0);progress()}
-function renderPages(){const r=S.rd;if(!r)return;const arr=cur(),box=$('#pages');box.classList.toggle('single',P.mode==='page');$('#modeBtn').textContent=P.mode==='page'?'▭':'↕';$('#saverBtn').textContent=P.saver?'Eco':'HD';
+function renderPages(){const r=S.rd;if(!r)return;$('#modeBtn').disabled=false;$('#saverBtn').disabled=false;const arr=cur(),box=$('#pages');box.classList.toggle('single',P.mode==='page');$('#modeBtn').textContent=P.mode==='page'?'▭':'↕';$('#saverBtn').textContent=P.saver?'Eco':'HD';
 if(!arr.length){box.innerHTML='';$('#pageStatus').textContent='Este capítulo não tem páginas disponíveis.';return}$('#pageStatus').textContent='';
 if(P.mode==='page'){showPage(S.page)}else{if(S.io)S.io.disconnect();box.innerHTML=arr.map((u,i)=>'<img data-i="'+i+'" loading="'+(i<=S.page+2?'eager':'lazy')+'" src="'+esc(u)+'" alt="Página '+(i+1)+'">').join('');observe();$('#endReader').classList.remove('hidden');if(S.page>0)setTimeout(()=>{const im=$$('#pages img')[S.page];if(im)im.scrollIntoView()},350)}
 progress()}
@@ -218,7 +229,10 @@ function pageGo(d){const t=S.page+d;if(t<0)return;if(t>=cur().length){goChapter(
 function renderLibrary(){$$('[data-lib]').forEach(b=>b.classList.toggle('active',b.dataset.lib===S.lib));const b=$('#libBody');
 if(S.lib==='fav'){const l=favs();$('#libCount').textContent=l.length+' obras';b.innerHTML=l.length?'<div class="grid">'+l.map(card).join('')+'</div>':'<div class="empty">Você ainda não favoritou nada. Toque no ♡ de qualquer capa para salvar aqui.</div>'}
 else{const l=hist();$('#libCount').textContent=l.length+' leituras';b.innerHTML=l.length?l.map(h=>'<a class="chapter" href="#/r/'+h.id+'/'+h.cid+'"><span class="hrow"><img src="'+esc(cover(h,256))+'" alt=""><span><b>'+esc(h.title)+'</b><br><span class="small muted">Cap. '+esc(h.ch||'?')+' · pág. '+(h.page+1)+'/'+(h.total||'?')+'</span></span></span><span class="small muted">'+ago(h.t)+'</span></a>').join('')+'<button class="btn outline sm" id="clrHist">Limpar hist\u00f3rico</button>':'<div class="empty">Seu hist\u00f3rico aparece aqui quando você começar a ler.</div>'}}
-async function loadGroups(){S.groupsLoaded=1;const el=$('#groups');el.innerHTML='<div class="loading">Buscando grupos…</div>';try{const d=await api('/api/groups?q='+encodeURIComponent($('#groupSearch').value.trim()));el.innerHTML=d.data.map(g=>'<div class="chapter"><span><b>'+esc(g.name||'Grupo sem nome')+'</b><br><span class="small muted">'+esc((g.description||'Grupo MangaDex').slice(0,140))+'</span></span><a href="https://mangadex.org/group/'+esc(g.id)+'" target="_blank" rel="noopener">MangaDex ↗</a></div>').join('')||'<div class="empty">Nenhum grupo encontrado.</div>'}catch(e){el.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}}
+let scanCache=[];async function loadScans(){S.groupsLoaded=1;const el=$('#scanCards');el.innerHTML='<div class="loading">Carregando diretório de scans…</div>';try{const d=await api('/api/scans');scanCache=d.data||[];$('#scanUploadTeam').innerHTML=scanCache.filter(s=>s.status!=='inactive').map(s=>'<option value="'+esc(s.slug)+'">'+esc(s.name)+'</option>').join('');renderScans()}catch(e){el.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}}
+function renderScans(){const q=$('#scanSearch').value.trim().toLowerCase(),st=$('#scanStatus').value;const list=scanCache.filter(s=>(!st||s.status===st)&&(!q||s.name.toLowerCase().includes(q)||s.description.toLowerCase().includes(q)));$('#scanCount').textContent=list.length+' equipes';$('#scanCards').classList.remove('hidden');$('#scanProfile').classList.add('hidden');$('#scanCards').innerHTML=list.map(s=>'<article class="card scan-card"><div class="scan-status">'+esc(({public:'Canais públicos',community:'Comunidade',review:'Atividade a confirmar',inactive:'Inativa · arquivo'}[s.status]||'Scan'))+'</div><h3>'+esc(s.name)+'</h3><p class="small muted">'+esc(s.description)+'</p><p class="small">'+esc(s.activity||'')+'</p><div class="scan-links"><a href="#/scan/'+encodeURIComponent(s.slug)+'">Ver perfil →</a>'+(s.catalogUrl?'<a href="'+esc(s.catalogUrl)+'" target="_blank" rel="noopener noreferrer">Abrir fonte ↗</a>':'')+'</div></article>').join('')||'<div class="empty" style="grid-column:1/-1">Nenhuma scan encontrada.</div>'}
+async function openScan(slug){show('scans');if(!scanCache.length)await loadScans();const s=scanCache.find(x=>x.slug===slug);const cards=$('#scanCards'),profile=$('#scanProfile');if(!s){toast('Scan não encontrada no diretório');return}cards.classList.add('hidden');profile.classList.remove('hidden');profile.innerHTML='<button class="btn outline sm" id="backScans">← Todas as scans</button><div class="sectionhead"><h2>'+esc(s.name)+'</h2><span class="scan-status">'+esc(({public:'Canais públicos',community:'Comunidade',review:'A confirmar',inactive:'Inativa · arquivo'}[s.status]||'Scan'))+'</span></div><div class="notice"><p>'+esc(s.description)+'</p><p class="small muted">'+esc(s.activity||'')+'</p><p>'+esc(s.note||'')+'</p></div><div class="sectionhead"><h3>Obras e capítulos publicados no MangaFlip</h3></div><div id="scanWorks" class="grid"><div class="loading">Carregando catálogo…</div></div><div class="sectionhead"><h3>Canais da equipe</h3></div><div class="notice"><div class="scan-links">'+(s.links||[]).map(l=>'<a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+' ↗</a>').join('')+'</div></div>';$('#backScans').onclick=()=>{location.hash='#/scans'};try{const [d]=await Promise.all([api('/api/library?scan='+encodeURIComponent(slug))]);const internal=(d.data||[]).map(w=>'<article class="card scan-card"><h3>'+esc(w.title)+'</h3><p class="small muted">'+esc(w.description||'')+'</p><p class="small">'+w.chapters.length+' capítulo(s) no leitor MangaFlip</p><div>'+w.chapters.map(c=>'<a class="chapter" href="#/scan-read/'+encodeURIComponent(slug)+'/'+encodeURIComponent(w.id)+'/'+encodeURIComponent(c.id)+'"><span><b>Capítulo '+esc(c.number)+'</b>'+(c.title?' · '+esc(c.title):'')+'</span><span class="small muted">'+c.pages+' pág.</span></a>').join('')+'</div></article>').join('');const external=(s.projects||[]).map(w=>'<article class="card scan-card"><h3>'+esc(w.title)+'</h3><p class="small muted">'+esc(w.type==='manhwa'?'Manhwa':'Mangá')+' · '+esc(w.latest)+'</p><a class="btn outline sm" href="'+esc(w.url)+'" target="_blank" rel="noopener noreferrer">Ler no site oficial ↗</a><p class="small muted">Páginas ainda não integradas ao leitor MangaFlip.</p></article>').join('');$('#scanWorks').innerHTML=internal+external||'<div class="empty" style="grid-column:1/-1">Esta equipe ainda não divulgou obras no catálogo.</div>'}catch(e){$('#scanWorks').innerHTML='<div class="empty">Não foi possível carregar o catálogo: '+esc(e.message)+'</div>'}document.title=s.name+' · Scans · MangáFlip'}
+async function openScanChapter(slug,workId,chapterId){const tok=++S.nav;scanReadState={slug};show('reader');$('#readerTitle').textContent='Carregando capítulo…';$('#readerMeta').textContent='';$('#pages').innerHTML='';$('#endReader').classList.add('hidden');$('#pageStatus').textContent='Carregando páginas…';$('#pbar').style.width='0';try{const d=await api('/api/library/chapter?scan='+encodeURIComponent(slug)+'&work='+encodeURIComponent(workId)+'&chapter='+encodeURIComponent(chapterId));if(tok!==S.nav)return;$('#readerTitle').textContent=d.workTitle;$('#readerMeta').textContent='Capítulo '+d.number+(d.title?' · '+d.title:'')+' · '+d.pages.length+' páginas · '+d.scanName;document.title='Cap. '+d.number+' · '+d.workTitle+' · MangáFlip';$('#pageStatus').textContent='';$('#pages').classList.remove('single');$('#pages').innerHTML=d.pages.map((u,i)=>'<img loading="'+(i<3?'eager':'lazy')+'" src="'+esc(u)+'" alt="Página '+(i+1)+'">').join('');$('#pbar').style.width='100%';$('#prevCh').disabled=true;$('#nextCh').disabled=true;$('#modeBtn').disabled=true;$('#saverBtn').disabled=true;$('#endReader').classList.remove('hidden');$('#endReader').innerHTML='<div class="muted">Fim do capítulo '+esc(d.number)+'</div><a class="btn outline" href="#/scan/'+encodeURIComponent(slug)+'">Voltar à scan</a>'}catch(e){if(tok!==S.nav)return;$('#pageStatus').innerHTML='Não foi possível abrir este capítulo: '+esc(e.message)+'<br><br><a class="btn outline" href="#/scan/'+encodeURIComponent(slug)+'">← Voltar à scan</a>'}}
 function exportData(){const o={v:1,fav:favs(),hist:hist(),read:store.get('read',{}),prefs:P};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download='manga-hub-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 function importData(txt){try{const o=JSON.parse(txt);const f=favs();(o.fav||[]).forEach(x=>{if(x&&isId(x.id)&&!f.some(y=>y.id===x.id))f.push(x)});store.set('fav',f);
 const h=hist();(o.hist||[]).forEach(x=>{if(!x||!isId(x.id))return;const i=h.findIndex(y=>y.id===x.id);if(i<0)h.push(x);else if((x.t||0)>(h[i].t||0))h[i]=x});h.sort((a,b)=>(b.t||0)-(a.t||0));store.set('hist',h.slice(0,40));
@@ -243,13 +257,13 @@ function fixEscapedUnicode(){
 
 let steps=0;
 function go(t){const h=t==='home'?'#/':'#/'+t;if(location.hash===h||(t==='home'&&!location.hash))route();else location.hash=h}
-function show(tab){S.tab=tab;['home','catalog','library','scans','detail','reader','about','settings'].forEach(x=>$('#'+x).classList.toggle('hidden',x!==tab));$$('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.body.classList.toggle('reading',tab==='reader');if(tab!=='reader')leaveReader();if(tab!=='detail'&&tab!=='reader')document.title='MangáFlip';window.scrollTo(0,0)}
+function show(tab){S.tab=tab;['home','catalog','library','scans','detail','reader','about','settings'].forEach(x=>$('#'+x).classList.toggle('hidden',x!==tab));$('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.body.classList.toggle('reading',tab==='reader');if(tab!=='reader'){scanReadState=null;leaveReader()}if(tab!=='detail'&&tab!=='reader')document.title='MangáFlip';window.scrollTo(0,0)}
 function route(){const p=location.hash.replace(/^#\/?/,'').split('/'),r=p[0]||'home';
-if(r==='m'&&isId(p[1]))return openManga(p[1]);if(r==='r'&&isId(p[1])&&isId(p[2]))return openReader(p[1],p[2]);
+if(r==='scan'&&p[1])return openScan(decodeURIComponent(p[1]));if(r==='scan-read'&&p[1]&&p[2]&&p[3])return openScanChapter(decodeURIComponent(p[1]),decodeURIComponent(p[2]),decodeURIComponent(p[3]));if(r==='m'&&isId(p[1]))return openManga(p[1]);if(r==='r'&&isId(p[1])&&isId(p[2]))return openReader(p[1],p[2]);
 const t=['home','catalog','library','scans','about','settings'].includes(r)?r:'home';show(t);
 if(t==='home'){renderContinue();if(!S.homeLoaded){S.homeLoaded=1;loadHome()}}
 else if(t==='catalog'){if(!S.catLoaded){S.catLoaded=1;loadTags();renderTags();searchCatalog(true)}}
-else if(t==='library')renderLibrary();else if(t==='scans'&&!S.groupsLoaded)loadGroups();else if(t==='settings')applyTheme()}
+else if(t==='library')renderLibrary();else if(t==='scans'){if(!S.groupsLoaded)loadScans();else renderScans()}else if(t==='settings')applyTheme()}
 /* ---------- eventos ---------- */
 document.addEventListener('click',e=>{const t=e.target;let x;
 if(x=t.closest('[data-remove-history]')){e.preventDefault();e.stopPropagation();removeHistory(x.dataset.removeHistory);return}
@@ -281,14 +295,15 @@ $('#catalogForm').onsubmit=e=>{e.preventDefault();searchCatalog(true)};
 let dt;$('#catalogSearch').oninput=()=>{clearTimeout(dt);dt=setTimeout(()=>searchCatalog(true),550)};
 ['#fSort','#fOrigin','#fLang','#fStatus'].forEach(s=>{$(s).onchange=()=>searchCatalog(true)});
 $('#more').onclick=()=>searchCatalog(false);
-$('#groupForm').onsubmit=e=>{e.preventDefault();loadGroups()};
+$('#scanSearchForm').onsubmit=e=>{e.preventDefault();renderScans()};$('#scanSearch').oninput=renderScans;$('#scanStatus').onchange=renderScans;
+$('#scanUploadForm').onsubmit=async e=>{e.preventDefault();const status=$('#scanUploadStatus'),btn=$('#scanUploadSubmit'),files=$('#scanUploadFiles').files;if(!files.length){toast('Selecione as páginas do capítulo');return}const fd=new FormData();fd.set('scanSlug',$('#scanUploadTeam').value);fd.set('title',$('#scanUploadTitle').value);fd.set('description',$('#scanUploadDesc').value);fd.set('chapter',$('#scanUploadChapter').value);fd.set('chapterTitle',$('#scanUploadChapterTitle').value);fd.set('authorized',$('#scanUploadConsent').checked?'yes':'no');for(const file of files)fd.append('pages',file);btn.disabled=true;status.textContent=' Enviando '+files.length+' páginas…';try{const res=await fetch('/api/admin/scan-upload',{method:'POST',headers:{Authorization:'Bearer '+$('#scanUploadToken').value},body:fd});const data=await res.json();if(!res.ok)throw new Error(data.error||'Falha no envio');status.textContent=' Publicado!';toast('Capítulo publicado no MangaFlip ✓');$('#scanUploadForm').reset();$('#scanUploadToken').value='';if(location.hash.startsWith('#/scan/'))openScan(decodeURIComponent(location.hash.split('/')[2]));}catch(err){status.textContent=' '+err.message;toast('Não foi possível publicar: '+err.message)}finally{btn.disabled=false}};
 $('#chLang').onchange=()=>{S.lang=$('#chLang').value;P.lang=S.lang;store.set('prefs',P);loadChapters(true)};
 $('#chOrder').onclick=()=>{S.order=S.order==='desc'?'asc':'desc';$('#chOrder').textContent=S.order==='desc'?'↓ Recentes':'↑ Antigos';renderChapters()};
 $('#chFind').oninput=renderChapters;$('#unavBtn').onclick=()=>{P.showUnavailable=P.showUnavailable===false;store.set('prefs',P);renderChapters()};
 $('#moreChapters').onclick=()=>loadChapters(false);
 $('#randBtn').onclick=async()=>{try{const m=await api('/api/random');location.hash='#/m/'+m.id}catch(e){toast('Não foi possível sortear agora')}};
-$('#refresh').onclick=()=>{if(S.tab==='home')loadHome();else if(S.tab==='catalog')searchCatalog(true);else if(S.tab==='scans')loadGroups();else if(S.tab==='library')renderLibrary();else route()};
-$('#closeReader').onclick=()=>{location.hash='#/m/'+(S.rd?S.rd.mid:(S.manga?S.manga.id:''))};
+$('#refresh').onclick=()=>{if(S.tab==='home')loadHome();else if(S.tab==='catalog')searchCatalog(true);else if(S.tab==='scans')loadScans();else if(S.tab==='library')renderLibrary();else route()};
+$('#closeReader').onclick=()=>{if(scanReadState){location.hash='#/scan/'+encodeURIComponent(scanReadState.slug);return}location.hash='#/m/'+(S.rd?S.rd.mid:(S.manga?S.manga.id:''))};
 $('#prevCh').onclick=()=>goChapter(-1);$('#nextCh').onclick=()=>goChapter(1);
 $('#modeBtn').onclick=()=>{P.mode=P.mode==='page'?'scroll':'page';store.set('prefs',P);toast(P.mode==='page'?'Modo página a página':'Modo rolagem contínua');renderPages()};
 $('#saverBtn').onclick=()=>{P.saver=!P.saver;store.set('prefs',P);toast(P.saver?'Modo econômico (menos dados)':'Qualidade padrão');renderPages()};
@@ -314,7 +329,7 @@ applyTheme();fixEscapedUnicode();
 route();
 </script></body></html>`;
 
-const cors = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,OPTIONS","Access-Control-Allow-Headers":"Content-Type"};
+const cors = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type,Authorization"};
 const J = (data, status = 200, ttl = 60) => new Response(JSON.stringify(data), {status, headers: {...cors, "Content-Type": "application/json; charset=utf-8", "Cache-Control": (status >= 400 || !ttl) ? "no-store" : "public, max-age=" + ttl}});
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
@@ -392,11 +407,11 @@ function simp(m, full) {
   return o;
 }
 
-Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
+Bun.serve({hostname: "0.0.0.0", port: 3000, maxRequestBodySize: 100 * 1024 * 1024, async fetch(req) {
   const u = new URL(req.url), p = u.pathname, q = u.searchParams;
   if (req.method === "OPTIONS") return new Response(null, {headers: cors});
   if (p === "/") return new Response(html, {headers: {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"}});
-  if (p === "/api/health") return J({ok: true, app: "MangáFlip", version: "1.0", sources: ["MangaDex", "AniList"], cache: mem.size, uptime: Math.round(process.uptime()), time: new Date().toISOString()}, 200, 0);
+  if (p === "/api/health") return J({ok: true, app: "MangáFlip", version: "1.1", sources: ["MangaDex", "AniList", "Scans independentes"], cache: mem.size, uptime: Math.round(process.uptime()), time: new Date().toISOString()}, 200, 0);
   if (p === "/favicon.ico") return new Response(null, {status: 204});
   if (p === "/icon.svg") return new Response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#7b3bc1"/><text x="32" y="45" font-size="36" font-weight="900" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif">M</text></svg>', {headers: {"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}});
   if (p === "/manifest.webmanifest") return new Response(JSON.stringify({name: "MangáFlip", short_name: "MangáFlip", start_url: "/", display: "standalone", background_color: "#100b17", theme_color: "#130d1c", lang: "pt-BR", icons: [{src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any"}]}), {headers: {"Content-Type": "application/manifest+json", "Cache-Control": "public, max-age=86400"}});
@@ -490,12 +505,55 @@ Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
         saver: (at.chapter.dataSaver || []).map(f => base + "/data-saver/" + h + "/" + enc(f))
       }, 200, 120);
     }
-    if (p === "/api/groups") {
-      const s = new URLSearchParams({limit: "40", "order[followedCount]": "desc"});
-      const n = (q.get("q") || "").trim().slice(0, 80); if (n) s.set("name", n);
-      const qs = s.toString();
-      const d = await cached("g:" + qs, 300, () => md("/group?" + qs));
-      return J({data: d.data.map(g => ({id: g.id, name: g.attributes.name, description: g.attributes.description || ""}))}, 200, 300);
+    if (p === "/api/library" && req.method === "GET") {
+      const scans = await Bun.file(new URL("./scans.json", import.meta.url)).json();
+      const libPath = (process.env.SCAN_LIBRARY_DIR || "/data/scan-library") + "/library.json";
+      const lib = await Bun.file(libPath).exists() ? await Bun.file(libPath).json() : {works: []};
+      const slug = (q.get("scan") || "").trim();
+      const data = lib.works.filter(w => !slug || w.scanSlug === slug).map(w => ({...w, chapters: [...w.chapters].sort((a,b) => (Number(b.number)||0)-(Number(a.number)||0)).map(c => ({id:c.id,number:c.number,title:c.title,pages:c.files.length,createdAt:c.createdAt}))}));
+      return J({data: data.map(w => ({...w, scanName: (scans.find(s=>s.slug===w.scanSlug)||{}).name || w.scanSlug}))}, 200, 15);
+    }
+    if (p === "/api/library/chapter" && req.method === "GET") {
+      const libPath = (process.env.SCAN_LIBRARY_DIR || "/data/scan-library") + "/library.json";
+      const lib = await Bun.file(libPath).exists() ? await Bun.file(libPath).json() : {works: []};
+      const slug=q.get("scan"),workId=q.get("work"),chapterId=q.get("chapter");
+      const w=lib.works.find(x=>x.scanSlug===slug&&x.id===workId),c=w&&w.chapters.find(x=>x.id===chapterId);
+      if(!w||!c)return J({error:"Obra ou capítulo não encontrado"},404,0);
+      const scans=await Bun.file(new URL("./scans.json",import.meta.url)).json(),scan=scans.find(x=>x.slug===slug);
+      return J({scanName:scan?scan.name:slug,workTitle:w.title,number:c.number,title:c.title,pages:c.files.map(f=>"/media/"+encodeURIComponent(slug)+"/"+encodeURIComponent(w.id)+"/"+encodeURIComponent(c.id)+"/"+encodeURIComponent(f))},200,0);
+    }
+    if (p.startsWith("/media/")) {
+      const bits=p.split("/").slice(2).map(decodeURIComponent);
+      if(bits.length!==4||bits.some(x=>! /^[a-zA-Z0-9._-]{1,120}$/.test(x)))return new Response("Not found",{status:404});
+      const file=Bun.file((process.env.SCAN_LIBRARY_DIR||"/data/scan-library")+"/files/"+bits.join("/"));
+      if(!await file.exists())return new Response("Not found",{status:404});
+      return new Response(file,{headers:{"Content-Type":file.type||"application/octet-stream","Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
+    }
+    if (p === "/api/admin/scan-upload" && req.method === "POST") {
+      const expected=process.env.SCAN_UPLOAD_TOKEN||"";
+      if(!expected||req.headers.get("authorization")!=="Bearer "+expected)return J({error:"Chave de publicação inválida"},401,0);
+      const form=await req.formData(),slug=String(form.get("scanSlug")||""),title=String(form.get("title")||"").trim(),description=String(form.get("description")||"").trim().slice(0,600),number=String(form.get("chapter")||"").trim(),chapterTitle=String(form.get("chapterTitle")||"").trim().slice(0,160),authorized=String(form.get("authorized")||"");
+      const scans=await Bun.file(new URL("./scans.json",import.meta.url)).json();
+      if(!scans.some(s=>s.slug===slug&&s.status!=="inactive"))return J({error:"Scan não cadastrada ou inativa"},400,0);
+      if(!title||!number||authorized!=="yes")return J({error:"Informe a obra, o capítulo e confirme a autorização de publicação"},400,0);
+      const uploads=form.getAll("pages").filter(x=>x instanceof File&&x.size>0);
+      if(!uploads.length||uploads.length>100)return J({error:"Envie entre 1 e 100 páginas"},400,0);
+      if(uploads.some(x=>!(["image/jpeg","image/png","image/webp","image/avif"].includes(x.type))||x.size>12*1024*1024))return J({error:"Use imagens JPG, PNG, WebP ou AVIF de até 12 MB cada"},400,0);
+      if(uploads.reduce((n,x)=>n+x.size,0)>90*1024*1024)return J({error:"O envio ultrapassa 90 MB por capítulo"},413,0);
+      const root=process.env.SCAN_LIBRARY_DIR||"/data/scan-library",workId=title.toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,55)||"obra";
+      const libFile=root+"/library.json";await mkdir(root+"/files/"+slug,{recursive:true});
+      const lib=await Bun.file(libFile).exists()?await Bun.file(libFile).json():{works:[]};
+      let work=lib.works.find(w=>w.scanSlug===slug&&w.slug===workId);
+      if(!work){work={id:workId+"-"+crypto.randomUUID().slice(0,8),slug:workId,scanSlug:slug,title,description,createdAt:new Date().toISOString(),chapters:[]};lib.works.push(work)}
+      const chapterId="ch-"+crypto.randomUUID().slice(0,12),dir=root+"/files/"+slug+"/"+work.id+"/"+chapterId;await mkdir(dir,{recursive:true});const files=[];
+      for(let i=0;i<uploads.length;i++){const ext=({"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/avif":"avif"})[uploads[i].type],name=String(i+1).padStart(3,"0")+"."+ext;await Bun.write(dir+"/"+name,uploads[i]);files.push(name)}
+      work.chapters.push({id:chapterId,number,title:chapterTitle,files,createdAt:new Date().toISOString()});
+      await Bun.write(libFile,JSON.stringify(lib,null,2));return J({ok:true,workId:work.id,chapterId,pages:files.length},201,0);
+    }
+    if (p === "/api/scans") {
+      const scans = await Bun.file(new URL("./scans.json", import.meta.url)).json();
+      const slug = (q.get("slug") || "").trim();
+      return J({data: slug ? scans.filter(s => s.slug === slug) : scans}, 200, 300);
     }
     if (p === "/api/anilist") {
       const page = clamp(Number(q.get("page")) || 1, 1, 50);

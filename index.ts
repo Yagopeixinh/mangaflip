@@ -401,7 +401,7 @@ function simp(m, full) {
   return o;
 }
 
-Bun.serve({port: Number(Bun.env.PORT) || 3000, async fetch(req) {
+Bun.serve({hostname: "0.0.0.0", port: 3000, async fetch(req) {
   const u = new URL(req.url), p = u.pathname, q = u.searchParams;
   if (req.method === "OPTIONS") return new Response(null, {headers: cors});
   if (p === "/") return new Response(html, {headers: {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"}});

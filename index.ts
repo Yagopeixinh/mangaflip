@@ -258,7 +258,7 @@ if(r==='scan'&&p[1])return openScan(decodeURIComponent(p[1]));if(r==='m'&&isId(p
 const t=['home','catalog','library','scans','about','settings'].includes(r)?r:'home';show(t);
 if(t==='home'){renderContinue();if(!S.homeLoaded){S.homeLoaded=1;loadHome()}}
 else if(t==='catalog'){if(!S.catLoaded){S.catLoaded=1;loadTags();renderTags();searchCatalog(true)}}
-else if(t==='library')renderLibrary();else if(t==='scans'&&!S.groupsLoaded)loadScans();else if(t==='settings')applyTheme()}
+else if(t==='library')renderLibrary();else if(t==='scans'){if(!S.groupsLoaded)loadScans();else renderScans()}else if(t==='settings')applyTheme()}
 /* ---------- eventos ---------- */
 document.addEventListener('click',e=>{const t=e.target;let x;
 if(x=t.closest('[data-remove-history]')){e.preventDefault();e.stopPropagation();removeHistory(x.dataset.removeHistory);return}

@@ -1,70 +1,78 @@
 [
   {
-    "slug": "silence-scan",
-    "name": "Silence Scan",
-    "description": "Grupo brasileiro de tradução. Mantém canais públicos para leitor, redes sociais, comunidade e recrutamento.",
+    "slug": "maid-scan",
+    "name": "Maid Scan — Empreguetes",
+    "description": "Equipe brasileira de tradução de mangás e manhwas. Mantém site próprio, Telegram de lançamentos e comunidade no Discord.",
     "language": ["pt-br"],
     "status": "public",
+    "activity": "Há publicações recentes no canal público de atualizações.",
     "links": [
-      {"label": "Central de links", "url": "https://silencescan.com.br/links", "kind": "community"},
-      {"label": "Linktree oficial", "url": "https://linktr.ee/SilenceScan", "kind": "community"}
+      {"label": "Site da equipe", "url": "https://empreguetes.xyz/", "kind": "catalog"},
+      {"label": "Canal de atualizações", "url": "https://t.me/s/maidscan", "kind": "community"},
+      {"label": "Discord", "url": "https://discord.gg/empreguetes", "kind": "community"},
+      {"label": "Instagram", "url": "https://www.instagram.com/maid.scan/", "kind": "community"}
     ],
-    "catalogUrl": "https://silencescan.com.br/links",
+    "catalogUrl": "https://empreguetes.xyz/",
     "integration": "external",
-    "note": "Catálogo e capítulos ainda não possuem feed/API pública confirmada; por enquanto, o MangaFlip direciona ao canal do grupo."
+    "note": "O canal público divulga obras, números de capítulos e links para o site. Não foi confirmada uma API/feed público nem autorização para espelhar imagens; por enquanto, o MangaFlip direciona aos canais da própria equipe."
   },
   {
-    "slug": "sinensis-scan",
-    "name": "Sinensis Scan",
-    "description": "Equipe focada em manhwas coreanos, com canais públicos de atualizações e comunidade.",
+    "slug": "dokusho-scanlator",
+    "name": "Dokusho Scanlator",
+    "description": "Scan brasileira de mangás e manhwas, com Linktree que reúne site/comunidade, redes sociais e anúncios de capítulos.",
     "language": ["pt-br"],
     "status": "public",
+    "activity": "O Linktree apresenta projetos e publicações de capítulos.",
     "links": [
-      {"label": "Site de leitura", "url": "https://loverstoon.com", "kind": "catalog"},
-      {"label": "Telegram de atualizações", "url": "https://t.me/s/sinensisscan", "kind": "community"},
-      {"label": "Facebook", "url": "https://www.facebook.com/SinensisScan/", "kind": "community"}
+      {"label": "Central oficial de links", "url": "https://linktr.ee/dokushoscan", "kind": "community"},
+      {"label": "Discord", "url": "https://linktr.ee/dokushoscan", "kind": "community"},
+      {"label": "Instagram", "url": "https://linktr.ee/dokushoscan", "kind": "community"}
     ],
-    "catalogUrl": "https://loverstoon.com",
+    "catalogUrl": "https://linktr.ee/dokushoscan",
     "integration": "external",
-    "note": "O canal público informa atualizações e já reportou instabilidade do site. Feed/API para importação automática não foi confirmado."
-  },
-  {
-    "slug": "ninja-scan",
-    "name": "Ninja Scan",
-    "description": "Catálogo em português identificado como plataforma de scanlation, com páginas de séries e capítulos.",
-    "language": ["pt-br"],
-    "status": "needs-review",
-    "links": [
-      {"label": "Site e catálogo", "url": "https://ninjacomics.xyz/", "kind": "catalog"}
-    ],
-    "catalogUrl": "https://ninjacomics.xyz/?s=&post_type=wp-manga",
-    "integration": "external",
-    "note": "Domínio e estrutura de catálogo identificados em um pedido público de suporte ao leitor HakuNeko; vínculo oficial e permissão de integração ainda precisam ser confirmados."
+    "note": "A central pública lista lançamentos e canais da equipe, mas não foi identificada uma API/feed público para importar capítulos automaticamente."
   },
   {
     "slug": "mighty-scan",
     "name": "Mighty Scan",
-    "description": "Comunidade brasileira de traduções com servidor público no Discord.",
+    "description": "Comunidade brasileira de traduções com servidor oficial no Discord e foco em lançamentos de mangás.",
     "language": ["pt-br"],
     "status": "community",
+    "activity": "Servidor público com comunidade de grande porte.",
     "links": [
-      {"label": "Discord da comunidade", "url": "https://discord.com/servers/1233481736302755850", "kind": "community"}
+      {"label": "Discord oficial", "url": "https://discord.com/servers/1233481736302755850", "kind": "community"}
     ],
     "catalogUrl": "https://discord.com/servers/1233481736302755850",
     "integration": "community",
-    "note": "A presença pública confirmada é a comunidade no Discord; catálogo/feed de capítulos acessível sem login não foi confirmado."
+    "note": "A comunidade pública está identificada, mas catálogo/feed de capítulos acessível sem login não foi confirmado. Precisamos de um canal autorizado da equipe para integrar."
   },
   {
-    "slug": "imperio-scans",
-    "name": "Império Scans",
-    "description": "Grupo de tradução de mangás do inglês para o português, com comunidade pública.",
+    "slug": "gravity-scans",
+    "name": "Gravity Scans",
+    "description": "Equipe brasileira conhecida por projetos como Boku no Hero Academia e Kaiju No. 8.",
     "language": ["pt-br"],
-    "status": "community",
+    "status": "review",
+    "activity": "As referências públicas encontradas são antigas; atividade atual não confirmada.",
     "links": [
-      {"label": "Discord da comunidade", "url": "https://discord.me/imperioscans", "kind": "community"}
+      {"label": "Central de contato", "url": "https://gravityscans.contactin.bio/", "kind": "community"}
     ],
-    "catalogUrl": "https://discord.me/imperioscans",
-    "integration": "community",
-    "note": "A comunidade pública foi localizada; site próprio e feed/API de capítulos ainda precisam ser confirmados."
+    "catalogUrl": "https://gravityscans.contactin.bio/",
+    "integration": "external",
+    "note": "As publicações encontradas apontam para leitores parceiros e redes sociais. Não considerar ativa nem importar capítulos até confirmar o estado atual e obter autorização."
+  },
+  {
+    "slug": "mono-no-aware-scan",
+    "name": "Mono no Aware Scan",
+    "description": "Scan brasileira com site próprio e páginas de projetos e capítulos.",
+    "language": ["pt-br"],
+    "status": "inactive",
+    "activity": "A própria equipe publicou comunicado de encerramento em dezembro de 2022.",
+    "links": [
+      {"label": "Site e catálogo histórico", "url": "https://mononoawarescan.wixsite.com/mononoaware", "kind": "catalog"},
+      {"label": "Contato", "url": "https://mononoawarescan.wixsite.com/mononoaware/contato-1", "kind": "community"}
+    ],
+    "catalogUrl": "https://mononoawarescan.wixsite.com/mononoaware",
+    "integration": "external",
+    "note": "Mantida apenas como referência histórica, não como fonte ativa para novos capítulos."
   }
 ]

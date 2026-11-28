@@ -3,30 +3,100 @@
     "slug": "maid-scan",
     "name": "Maid Scan — Empreguetes",
     "description": "Equipe brasileira de tradução de mangás e manhwas. Mantém site próprio, Telegram de lançamentos e comunidade no Discord.",
-    "language": ["pt-br"],
+    "language": [
+      "pt-br"
+    ],
     "status": "public",
     "activity": "Há publicações recentes no canal público de atualizações.",
     "links": [
-      {"label": "Site da equipe", "url": "https://empreguetes.xyz/", "kind": "catalog"},
-      {"label": "Canal de atualizações", "url": "https://t.me/s/maidscan", "kind": "community"},
-      {"label": "Discord", "url": "https://discord.gg/empreguetes", "kind": "community"},
-      {"label": "Instagram", "url": "https://www.instagram.com/maid.scan/", "kind": "community"}
+      {
+        "label": "Site da equipe",
+        "url": "https://empreguetes.xyz/",
+        "kind": "catalog"
+      },
+      {
+        "label": "Canal de atualizações",
+        "url": "https://t.me/s/maidscan",
+        "kind": "community"
+      },
+      {
+        "label": "Discord",
+        "url": "https://discord.gg/empreguetes",
+        "kind": "community"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/maid.scan/",
+        "kind": "community"
+      }
     ],
     "catalogUrl": "https://empreguetes.xyz/",
     "integration": "external",
-    "note": "O canal público divulga obras, números de capítulos e links para o site. Não foi confirmada uma API/feed público nem autorização para espelhar imagens; por enquanto, o MangaFlip direciona aos canais da própria equipe."
+    "note": "Projetos e números de capítulos foram identificados nas publicações públicas da equipe. Os links levam ao leitor oficial da Maid Scan; a integração das páginas no leitor do MangaFlip depende de autorização da equipe.",
+    "projects": [
+      {
+        "title": "O Avanço da Juventude",
+        "latest": "Capítulos 126–132 · fim da história principal",
+        "url": "https://empreguetes.wtf/obras/o-avanco-da-juventude",
+        "type": "manhwa"
+      },
+      {
+        "title": "Acho Que Transmigrei Para Algum Lugar",
+        "latest": "Capítulos 94 e 95",
+        "url": "https://empreguetes.wtf/obra/acho-que-transmigrei-para-algum-lugar",
+        "type": "manhwa"
+      },
+      {
+        "title": "Adotei Um Pai Vilão",
+        "latest": "Capítulo 52",
+        "url": "https://novo.empreguetes.site/obra/12889/adotei-um-pai-vilao",
+        "type": "manhwa"
+      },
+      {
+        "title": "Me Chame De Diabo",
+        "latest": "Capítulos 121–123",
+        "url": "https://novo.empreguetes.site/obra/11099/me-chame-de-diabo",
+        "type": "manhwa"
+      },
+      {
+        "title": "Se Tornando a Filha do Herói Sombrio",
+        "latest": "Capítulos 1–40 anunciados",
+        "url": "https://novo.empreguetes.site/obra/13369/se-tornando-a-filha-do-heroi-sombrio",
+        "type": "manhwa"
+      },
+      {
+        "title": "Minha Família de Vilões Não Me Deixa em Paz",
+        "latest": "Capítulo 50",
+        "url": "https://novo.empreguetes.site/obra/10445/minha-familia-de-viloes-nao-me-deixa-em-paz",
+        "type": "manhwa"
+      }
+    ]
   },
   {
     "slug": "dokusho-scanlator",
     "name": "Dokusho Scanlator",
     "description": "Scan brasileira de mangás e manhwas, com Linktree que reúne site/comunidade, redes sociais e anúncios de capítulos.",
-    "language": ["pt-br"],
+    "language": [
+      "pt-br"
+    ],
     "status": "public",
     "activity": "O Linktree apresenta projetos e publicações de capítulos.",
     "links": [
-      {"label": "Central oficial de links", "url": "https://linktr.ee/dokushoscan", "kind": "community"},
-      {"label": "Discord", "url": "https://linktr.ee/dokushoscan", "kind": "community"},
-      {"label": "Instagram", "url": "https://linktr.ee/dokushoscan", "kind": "community"}
+      {
+        "label": "Central oficial de links",
+        "url": "https://linktr.ee/dokushoscan",
+        "kind": "community"
+      },
+      {
+        "label": "Discord",
+        "url": "https://linktr.ee/dokushoscan",
+        "kind": "community"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://linktr.ee/dokushoscan",
+        "kind": "community"
+      }
     ],
     "catalogUrl": "https://linktr.ee/dokushoscan",
     "integration": "external",
@@ -36,11 +106,17 @@
     "slug": "mighty-scan",
     "name": "Mighty Scan",
     "description": "Comunidade brasileira de traduções com servidor oficial no Discord e foco em lançamentos de mangás.",
-    "language": ["pt-br"],
+    "language": [
+      "pt-br"
+    ],
     "status": "community",
     "activity": "Servidor público com comunidade de grande porte.",
     "links": [
-      {"label": "Discord oficial", "url": "https://discord.com/servers/1233481736302755850", "kind": "community"}
+      {
+        "label": "Discord oficial",
+        "url": "https://discord.com/servers/1233481736302755850",
+        "kind": "community"
+      }
     ],
     "catalogUrl": "https://discord.com/servers/1233481736302755850",
     "integration": "community",
@@ -50,11 +126,17 @@
     "slug": "gravity-scans",
     "name": "Gravity Scans",
     "description": "Equipe brasileira conhecida por projetos como Boku no Hero Academia e Kaiju No. 8.",
-    "language": ["pt-br"],
+    "language": [
+      "pt-br"
+    ],
     "status": "review",
     "activity": "As referências públicas encontradas são antigas; atividade atual não confirmada.",
     "links": [
-      {"label": "Central de contato", "url": "https://gravityscans.contactin.bio/", "kind": "community"}
+      {
+        "label": "Central de contato",
+        "url": "https://gravityscans.contactin.bio/",
+        "kind": "community"
+      }
     ],
     "catalogUrl": "https://gravityscans.contactin.bio/",
     "integration": "external",
@@ -64,12 +146,22 @@
     "slug": "mono-no-aware-scan",
     "name": "Mono no Aware Scan",
     "description": "Scan brasileira com site próprio e páginas de projetos e capítulos.",
-    "language": ["pt-br"],
+    "language": [
+      "pt-br"
+    ],
     "status": "inactive",
     "activity": "A própria equipe publicou comunicado de encerramento em dezembro de 2022.",
     "links": [
-      {"label": "Site e catálogo histórico", "url": "https://mononoawarescan.wixsite.com/mononoaware", "kind": "catalog"},
-      {"label": "Contato", "url": "https://mononoawarescan.wixsite.com/mononoaware/contato-1", "kind": "community"}
+      {
+        "label": "Site e catálogo histórico",
+        "url": "https://mononoawarescan.wixsite.com/mononoaware",
+        "kind": "catalog"
+      },
+      {
+        "label": "Contato",
+        "url": "https://mononoawarescan.wixsite.com/mononoaware/contato-1",
+        "kind": "community"
+      }
     ],
     "catalogUrl": "https://mononoawarescan.wixsite.com/mononoaware",
     "integration": "external",
